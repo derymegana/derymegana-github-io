@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Image Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .image-box {
+            width: 48%;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            max-height: 300px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .download-btn {
+            background-color: #2196F3;
+        }
+        .download-btn:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image to Image Converter</h1>
+        
+        <div>
+            <input type="file" id="imageUpload" accept="image/*">
+            <button id="uploadBtn">Upload Image</button>
+        </div>
+        
+        <div class="image-container">
+            <div class="image-box">
+                <h3>Original Image</h3>
+                <img id="originalImage" src="placeholder.jpg" alt="Original Image">
+            </div>
+            <div class="image-box">
+                <h3>Processed Image</h3>
+                <img id="processedImage" src="placeholder.jpg" alt="Processed Image">
+                <button id="downloadBtn" class="download-btn">Download Image</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <h3>Image Filters</h3>
+            <div>
+                <button id="grayscaleBtn">Grayscale</button>
+                <button id="sepiaBtn">Sepia</button>
+                <button id="invertBtn">Invert Colors</button>
+                <button id="blurBtn">Blur</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <label for="brightness">Brightness: </label>
+                <input type="range" id="brightness" min="0" max="200" value="100">
+                
+                <label for="contrast">Contrast: </label>
+                <input type="range" id="contrast" min="0" max="200" value="100">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const imageUpload = document.getElementById('imageUpload');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const originalImage = document.getElementById('originalImage');
+        const processedImage = document.getElementById('processedImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        // Filter buttons
+        const grayscaleBtn = document.getElementById('grayscaleBtn');
+        const sepiaBtn = document.getElementById('sepiaBtn');
+        const invertBtn = document.getElementById('invertBtn');
+        const blurBtn = document.getElementById('blurBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // Sliders
+        const brightnessSlider = document.getElementById('brightness');
+        const contrastSlider = document.getElementById('contrast');
+        
+        // Current image data
+        let currentImage = null;
+        
+        // Event listeners
+        uploadBtn.addEventListener('click', handleUpload);
+        downloadBtn.addEventListener('click', downloadImage);
+        
+        grayscaleBtn.addEventListener('click', () => applyFilter('grayscale'));
+        sepiaBtn.addEventListener('click', () => applyFilter('sepia'));
+        invertBtn.addEventListener('click', () => applyFilter('invert'));
+        blurBtn.addEventListener('click', () => applyFilter('blur'));
+        resetBtn.addEventListener('click', resetFilters);
+        
+        brightnessSlider.addEventListener('input', updateFilters);
+        contrastSlider.addEventListener('input', updateFilters);
+        
+        // Functions
+        function handleUpload() {
+            const file = imageUpload.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    processedImage.src = e.target.result;
+                    currentImage = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select an image first.');
+            }
+        }
+        
+        function applyFilter(filter) {
+            let filterValue = '';
+            
+            switch(filter) {
+                case 'grayscale':
+                    filterValue = 'grayscale(100%)';
+                    break;
+                case 'sepia':
+                    filterValue = 'sepia(100%)';
+                    break;
+                case 'invert':
+                    filterValue = 'invert(100%)';
+                    break;
+                case 'blur':
+                    filterValue = 'blur(5px)';
+                    break;
+            }
+            
+            processedImage.style.filter = filterValue;
+        }
+        
+        function resetFilters() {
+            processedImage.style.filter = 'none';
+            brightnessSlider.value = 100;
+            contrastSlider.value = 100;
+            updateFilters();
+        }
+        
+        function updateFilters() {
+            const brightness = brightnessSlider.value;
+            const contrast = contrastSlider.value;
+            
+            processedImage.style.filter = `
+                brightness(${brightness}%)
+                contrast(${contrast}%)
+            `;
+        }
+        
+        function downloadImage() {
+            if (!currentImage) {
+                alert('No image to download.');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = processedImage.src;
+            link.download = 'processed-image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
