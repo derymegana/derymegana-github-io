@@ -1,0 +1,145 @@
+import pygame
+import random
+import sys
+
+# Inisialisasi pygame
+pygame.init()
+
+# Ukuran layar
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Game Tembak Bebek")
+
+# Warna
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+BROWN = (139, 69, 19)
+
+# Variabel game
+clock = pygame.time.Clock()
+FPS = 60
+score = 0
+font = pygame.font.SysFont('Arial', 30)
+
+# Kelas Bebek
+class Duck:
+    def __init__(self):
+        self.width = 60
+        self.height = 60
+        self.x = random.randint(0, WIDTH - self.width)
+        self.y = HEIGHT
+        self.speed = random.randint(3, 7)
+        self.active = True
+        self.color = BROWN
+    
+    def update(self):
+        self.y -= self.speed
+        if self.y < -self.height:
+            self.active = False
+    
+    def draw(self):
+        if self.active:
+            # Gambar tubuh bebek
+            pygame.draw.ellipse(screen, self.color, (self.x, self.y, self.width, self.height))
+            # Gambar kepala bebek
+            pygame.draw.circle(screen, self.color, (self.x + self.width//2, self.y - 10), 20)
+            # Gambar mata
+            pygame.draw.circle(screen, BLACK, (self.x + self.width//2 + 5, self.y - 15), 5)
+            # Gambar paruh
+            pygame.draw.polygon(screen, (255, 165, 0), [
+                (self.x + self.width//2 + 20, self.y - 10),
+                (self.x + self.width//2 + 40, self.y - 10),
+                (self.x + self.width//2 + 20, self.y - 5)
+            ])
+    
+    def is_hit(self, pos):
+        if not self.active:
+            return False
+        # Hit detection sederhana
+        duck_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        return duck_rect.collidepoint(pos)
+
+# Kelas Peluru
+class Bullet:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.radius = 5
+        self.speed = 10
+        self.active = True
+    
+    def update(self):
+        self.y -= self.speed
+        if self.y < 0:
+            self.active = False
+    
+    def draw(self):
+        if self.active:
+            pygame.draw.circle(screen, BLACK, (self.x, self.y), self.radius)
+
+# Daftar bebek dan peluru
+ducks = []
+bullets = []
+duck_spawn_timer = 0
+
+# Game loop
+running = True
+while running:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Klik kiri mouse
+                bullets.append(Bullet(event.pos[0], HEIGHT - 20))
+    
+    # Spawn bebek
+    duck_spawn_timer += 1
+    if duck_spawn_timer >= 60:  # Spawn bebek setiap 1 detik (60 frame)
+        ducks.append(Duck())
+        duck_spawn_timer = 0
+    
+    # Update game state
+    for duck in ducks[:]:
+        duck.update()
+        if not duck.active:
+            ducks.remove(duck)
+    
+    for bullet in bullets[:]:
+        bullet.update()
+        if not bullet.active:
+            bullets.remove(bullet)
+    
+    # Cek tabrakan peluru dengan bebek
+    for bullet in bullets:
+        for duck in ducks:
+            if duck.is_hit((bullet.x, bullet.y)):
+                duck.active = False
+                bullet.active = False
+                score += 10
+                break
+    
+    # Render
+    screen.fill(WHITE)
+    
+    # Gambar tanah
+    pygame.draw.rect(screen, GREEN, (0, HEIGHT - 20, WIDTH, 20))
+    
+    # Gambar bebek dan peluru
+    for duck in ducks:
+        duck.draw()
+    
+    for bullet in bullets:
+        bullet.draw()
+    
+    # Gambar skor
+    score_text = font.render(f"Skor: {score}", True, BLACK)
+    screen.blit(score_text, (10, 10))
+    
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
+sys.exit()
