@@ -4,29 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DERY AI - Advanced AI Image Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6e45e2;
-            --secondary: #88d3ce;
-            --accent: #ff7e5f;
-            --text: #f8f9fa;
-            --bg: #121212;
-            --card-bg: #1e1e1e;
-            --input-bg: #2a2a2a;
-            --border: #3a3a3a;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --error: #f44336;
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --text: #f5f6fa;
+            --bg: #2d3436;
+            --card-bg: #353b48;
+            --input-bg: #404852;
+            --light-text: #f5f6fa;
+            --dark-text: #2d3436;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --error: #d63031;
             --shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             --transition: all 0.3s ease;
         }
 
         [data-theme="light"] {
-            --text: #333333;
-            --bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --input-bg: #f0f2f5;
-            --border: #d1d5db;
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --text: #2d3436;
+            --bg: #f5f6fa;
+            --card-bg: #dfe6e9;
+            --input-bg: #ffffff;
+            --light-text: #f5f6fa;
+            --dark-text: #2d3436;
             --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
@@ -42,98 +48,77 @@
             color: var(--text);
             min-height: 100vh;
             transition: var(--transition);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(110, 69, 226, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(136, 211, 206, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 30% 50%, rgba(255, 126, 95, 0.1) 0%, transparent 30%);
-            background-attachment: fixed;
+            line-height: 1.6;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 20px;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
             position: relative;
             overflow: hidden;
-            padding: 2rem 0;
-            border-radius: 1rem;
-            background: linear-gradient(135deg, rgba(110, 69, 226, 0.2), rgba(136, 211, 206, 0.2));
-            box-shadow: var(--shadow);
         }
 
-        .header-content {
-            position: relative;
-            z-index: 2;
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            opacity: 0.1;
+            z-index: -1;
         }
 
-        .title {
-            font-size: 3.5rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-text {
+            font-size: 2rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
+            background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
             letter-spacing: 1px;
             position: relative;
-            display: inline-block;
         }
 
-        .title::after {
+        .logo-text::after {
             content: '';
             position: absolute;
             bottom: -5px;
             left: 0;
             width: 100%;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            background: linear-gradient(to right, var(--primary), var(--accent));
             border-radius: 3px;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
-            margin-bottom: 1.5rem;
-        }
-
-        .language-switcher {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .lang-btn {
-            background: var(--card-bg);
-            border: none;
-            color: var(--text);
-            padding: 0.3rem 0.8rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: var(--transition);
-        }
-
-        .lang-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
         .theme-toggle {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
             background: var(--card-bg);
             border: none;
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -141,295 +126,283 @@
             cursor: pointer;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            color: var(--text);
+            font-size: 1.2rem;
         }
 
         .theme-toggle:hover {
             transform: scale(1.1);
         }
 
-        .main-grid {
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 90px;
+        }
+
+        .language-btn {
+            background: var(--card-bg);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text);
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .language-btn:hover {
+            background: var(--primary);
+            color: var(--light-text);
+        }
+
+        main {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
-            gap: 2rem;
+            gap: 30px;
         }
 
         @media (max-width: 1024px) {
-            .main-grid {
+            main {
                 grid-template-columns: 1fr;
             }
         }
 
-        .control-panel {
-            background-color: var(--card-bg);
-            border-radius: 1rem;
-            padding: 1.5rem;
+        .settings-panel {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
             box-shadow: var(--shadow);
             height: fit-content;
             position: sticky;
-            top: 1rem;
+            top: 20px;
         }
 
         .panel-title {
             font-size: 1.5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 20px;
+            color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: var(--primary);
+            gap: 10px;
         }
 
-        .panel-title svg {
-            width: 1.5rem;
-            height: 1.5rem;
+        .panel-title i {
+            font-size: 1.2rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
 
-        .form-label {
+        label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
             font-weight: 600;
+            color: var(--text);
         }
 
-        .prompt-input {
+        textarea, select, input[type="text"] {
             width: 100%;
-            min-height: 120px;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
-            background-color: var(--input-bg);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--input-bg);
+            background: var(--input-bg);
             color: var(--text);
             font-size: 1rem;
-            resize: vertical;
             transition: var(--transition);
+            resize: none;
         }
 
-        .prompt-input:focus {
+        textarea:focus, select:focus, input[type="text"]:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(110, 69, 226, 0.3);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
         }
 
-        .negative-prompt-input {
-            width: 100%;
-            min-height: 60px;
-            padding: 0.8rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
-            background-color: var(--input-bg);
-            color: var(--text);
-            font-size: 0.9rem;
-            resize: vertical;
-            transition: var(--transition);
+        .prompt-textarea {
+            min-height: 150px;
         }
 
-        .negative-prompt-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(110, 69, 226, 0.3);
-        }
-
-        .select-input {
-            width: 100%;
-            padding: 0.8rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
-            background-color: var(--input-bg);
-            color: var(--text);
-            font-size: 0.9rem;
-            transition: var(--transition);
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.8rem center;
-            background-size: 1rem;
-        }
-
-        .select-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(110, 69, 226, 0.3);
+        .negative-prompt {
+            min-height: 80px;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .checkbox-label {
-            cursor: pointer;
-        }
-
-        .checkbox-input {
-            width: 1.2rem;
-            height: 1.2rem;
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
             accent-color: var(--primary);
-            cursor: pointer;
         }
 
         .btn {
-            padding: 0.8rem 1.5rem;
-            border-radius: 0.5rem;
+            background: var(--primary);
+            color: white;
             border: none;
-            font-weight: 600;
-            font-size: 1rem;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: var(--transition);
+            font-size: 1rem;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 8px;
+            transition: var(--transition);
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #5d3ac9;
+        .btn:hover {
+            background: var(--secondary);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
 
         .btn-secondary {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
             color: var(--text);
-            border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background-color: var(--input-bg);
-            transform: translateY(-2px);
+            background: var(--input-bg);
         }
 
-        .btn-accent {
-            background-color: var(--accent);
-            color: white;
+        .btn-danger {
+            background: var(--error);
         }
 
-        .btn-accent:hover {
-            background-color: #e66d4f;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+        .btn-danger:hover {
+            background: #c0392b;
         }
 
         .btn-group {
             display: flex;
-            gap: 0.8rem;
-            margin-top: 1rem;
+            gap: 10px;
         }
 
-        .btn-full {
-            width: 100%;
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
         .history-panel {
-            background-color: var(--card-bg);
-            border-radius: 1rem;
-            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
             box-shadow: var(--shadow);
-            margin-top: 2rem;
         }
 
         .history-list {
             max-height: 200px;
             overflow-y: auto;
-            margin-top: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .history-item {
-            padding: 0.8rem;
-            border-bottom: 1px solid var(--border);
+            background: var(--input-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .history-item:hover {
-            background-color: var(--input-bg);
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 1rem;
-        }
-
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: 0.8rem;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            aspect-ratio: 1/1;
-            background-color: var(--input-bg);
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .gallery-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-            padding: 1rem;
-            opacity: 0;
             transition: var(--transition);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .gallery-item:hover .gallery-overlay {
+        .history-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .history-item i {
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .history-item:hover i {
             opacity: 1;
         }
 
-        .gallery-prompt {
-            color: white;
-            font-size: 0.9rem;
-            margin-right: 0.5rem;
-            white-space: nowrap;
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-card {
+            background: var(--card-bg);
+            border-radius: 12px;
             overflow: hidden;
-            text-overflow: ellipsis;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
         }
 
-        .gallery-actions {
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-container {
+            position: relative;
+            padding-top: 100%;
+            background: var(--input-bg);
+            overflow: hidden;
+        }
+
+        .generated-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .image-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 15px;
             display: flex;
-            gap: 0.5rem;
+            justify-content: space-between;
+            opacity: 0;
+            transition: var(--transition);
         }
 
-        .gallery-btn {
+        .image-card:hover .image-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
             background: rgba(255, 255, 255, 0.2);
+            color: white;
             border: none;
-            width: 2rem;
-            height: 2rem;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -439,54 +412,76 @@
             backdrop-filter: blur(5px);
         }
 
-        .gallery-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .action-btn:hover {
+            background: var(--primary);
             transform: scale(1.1);
         }
 
-        .gallery-btn svg {
-            width: 1rem;
-            height: 1rem;
-            color: white;
+        .image-info {
+            padding: 15px;
+        }
+
+        .image-info h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .image-info p {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
         .loading-spinner {
-            width: 5rem;
-            height: 5rem;
-            border: 5px solid rgba(255, 255, 255, 0.1);
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             border-top-color: var(--primary);
             animation: spin 1s linear infinite;
-            margin-bottom: 2rem;
+            margin-bottom: 20px;
         }
 
         .loading-text {
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 600;
             color: white;
             text-align: center;
             position: relative;
         }
 
         .loading-text::after {
-            content: '';
-            animation: dots 1.5s infinite steps(3);
+            content: '...';
             position: absolute;
+            animation: dots 1.5s infinite steps(4, end);
         }
 
         @keyframes spin {
@@ -496,349 +491,180 @@
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
-        }
-
-        .advanced-settings {
-            margin-top: 2rem;
-            border-top: 1px solid var(--border);
-            padding-top: 1.5rem;
-        }
-
-        .accordion {
-            margin-bottom: 1rem;
-        }
-
-        .accordion-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .accordion.active .accordion-content {
-            max-height: 500px;
-            transition: max-height 0.5s ease-in;
-        }
-
-        .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-top: 0.8rem;
-        }
-
-        .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .radio-input {
-            width: 1.2rem;
-            height: 1.2rem;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .radio-label {
-            cursor: pointer;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            border-radius: 2rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            background-color: var(--primary);
-            color: white;
-            margin-left: 0.5rem;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--card-bg);
-            color: var(--text);
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-
-        .toast-success {
-            border-left: 4px solid var(--success);
-        }
-
-        .toast-error {
-            border-left: 4px solid var(--error);
-        }
-
-        .toast-icon {
-            font-size: 1.2rem;
+            60%, 100% { content: '...'; }
         }
 
         .share-modal {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 1001;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
         }
 
-        .share-modal.show {
+        .share-modal.active {
             opacity: 1;
             pointer-events: all;
         }
 
         .share-content {
-            background-color: var(--card-bg);
-            border-radius: 1rem;
-            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
             max-width: 500px;
             width: 90%;
             box-shadow: var(--shadow);
             position: relative;
         }
 
-        .share-close {
+        .close-modal {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 15px;
+            right: 15px;
             background: none;
             border: none;
             font-size: 1.5rem;
-            cursor: pointer;
             color: var(--text);
+            cursor: pointer;
         }
 
         .share-title {
             font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
             color: var(--primary);
         }
 
-        .share-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .share-btn {
+        .share-option {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: none;
-            border: none;
+            gap: 8px;
             cursor: pointer;
-            color: var(--text);
             transition: var(--transition);
+            padding: 10px;
+            border-radius: 8px;
         }
 
-        .share-btn:hover {
-            transform: translateY(-5px);
+        .share-option:hover {
+            background: var(--input-bg);
         }
 
         .share-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 0.5rem;
             font-size: 1.5rem;
-        }
-
-        .share-facebook {
-            background-color: #1877f2;
             color: white;
         }
 
-        .share-twitter {
-            background-color: #1da1f2;
-            color: white;
-        }
-
-        .share-whatsapp {
-            background-color: #25d366;
-            color: white;
-        }
-
-        .share-tiktok {
-            background-color: #000000;
-            color: white;
-        }
+        .facebook { background: #3b5998; }
+        .twitter { background: #1da1f2; }
+        .whatsapp { background: #25d366; }
+        .instagram { background: #e1306c; }
+        .tiktok { background: #000000; }
+        .reddit { background: #ff5700; }
+        .pinterest { background: #e60023; }
+        .telegram { background: #0088cc; }
 
         .share-link {
-            background-color: var(--input-bg);
-            color: var(--text);
-        }
-
-        .share-label {
-            font-size: 0.8rem;
-        }
-
-        .share-input-group {
-            margin-top: 1.5rem;
             display: flex;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        .share-input {
+        .share-link input {
             flex: 1;
-            padding: 0.8rem;
-            border-radius: 0.5rem 0 0 0.5rem;
-            border: 1px solid var(--border);
-            background-color: var(--input-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--input-bg);
+            background: var(--input-bg);
             color: var(--text);
         }
 
-        .share-copy {
-            padding: 0.8rem 1rem;
-            border-radius: 0 0.5rem 0.5rem 0;
-            border: 1px solid var(--border);
-            background-color: var(--primary);
+        .copy-link {
+            background: var(--primary);
             color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 8px;
             cursor: pointer;
             transition: var(--transition);
         }
 
-        .share-copy:hover {
-            background-color: #5d3ac9;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            background-color: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: var(--shadow);
-        }
-
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .empty-text {
-            opacity: 0.7;
-            margin-bottom: 1.5rem;
-        }
-
-        /* 3D elements */
-        .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.1;
-            filter: blur(30px);
-        }
-
-        .shape-1 {
-            width: 300px;
-            height: 300px;
-            background: var(--primary);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            top: 10%;
-            left: 5%;
-            animation: float 15s ease-in-out infinite;
-        }
-
-        .shape-2 {
-            width: 400px;
-            height: 400px;
+        .copy-link:hover {
             background: var(--secondary);
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            top: 60%;
-            left: 70%;
-            animation: float 20s ease-in-out infinite reverse;
         }
 
-        .shape-3 {
-            width: 200px;
-            height: 200px;
-            background: var(--accent);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            top: 30%;
-            left: 80%;
-            animation: float 12s ease-in-out infinite;
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1002;
+            opacity: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(20px, 30px) rotate(10deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+        .toast.show {
+            opacity: 1;
+            bottom: 30px;
+        }
+
+        .toast.error {
+            background: var(--error);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0;
+            border-top: 1px solid var(--input-bg);
+            font-size: 0.9rem;
+            color: var(--secondary);
         }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
             
-            .title {
-                font-size: 2.5rem;
-            }
-            
-            .subtitle {
-                font-size: 1rem;
+            .language-switcher {
+                position: static;
+                margin-top: 15px;
             }
             
             .btn-group {
                 flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
             }
             
             .gallery {
@@ -846,638 +672,590 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .title {
-                font-size: 2rem;
-            }
-            
-            .gallery {
-                grid-template-columns: 1fr;
-            }
-            
-            .radio-group {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+        /* 3D effect for cards */
+        .settings-panel, .image-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .settings-panel::before, .image-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(253, 121, 168, 0.1) 100%);
+            border-radius: inherit;
+            z-index: -1;
+            transform: translateZ(-1px);
+        }
+
+        /* Advanced settings accordion */
+        .advanced-settings {
+            margin-top: 20px;
+            border-top: 1px solid var(--input-bg);
+            padding-top: 20px;
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content.active {
+            max-height: 1000px;
+        }
+
+        /* Color palette selector */
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text);
+            transform: scale(1.1);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--card-bg);
+            color: var(--text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            box-shadow: var(--shadow);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--input-bg);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
         }
     </style>
 </head>
 <body>
-    <div class="floating-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-    </div>
-
     <div class="container">
         <header>
-            <div class="header-content">
-                <button class="theme-toggle" id="themeToggle">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <path d="M12 1v2"></path>
-                        <path d="M12 21v2"></path>
-                        <path d="M4.22 4.22l1.42 1.42"></path>
-                        <path d="M18.36 18.36l1.42 1.42"></path>
-                        <path d="M1 12h2"></path>
-                        <path d="M21 12h2"></path>
-                        <path d="M4.22 19.78l1.42-1.42"></path>
-                        <path d="M18.36 5.64l1.42-1.42"></path>
-                    </svg>
-                </button>
-                
-                <div class="language-switcher">
-                    <button class="lang-btn active" data-lang="en">EN</button>
-                    <button class="lang-btn" data-lang="id">ID</button>
+            <div class="header-bg"></div>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-robot"></i>
                 </div>
-                
-                <h1 class="title">DERY AI</h1>
-                <p class="subtitle" data-i18n="subtitle">Advanced AI Image & Text Generator</p>
+                <h1 class="logo-text">DERY AI</h1>
             </div>
+            <div class="language-switcher">
+                <button class="language-btn" id="languageToggle">
+                    <i class="fas fa-language"></i>
+                    <span id="currentLanguage">EN</span>
+                </button>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
         </header>
 
-        <div class="main-grid">
-            <div class="control-panel">
-                <h2 class="panel-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                    </svg>
-                    <span data-i18n="controlPanel">Control Panel</span>
-                </h2>
-
+        <main>
+            <section class="settings-panel">
+                <h2 class="panel-title"><i class="fas fa-sliders-h"></i> <span data-i18n="settings">Settings</span></h2>
+                
                 <div class="form-group">
-                    <label for="promptInput" class="form-label" data-i18n="promptLabel">Prompt</label>
-                    <textarea id="promptInput" class="prompt-input" placeholder="Describe the image you want to generate..." data-i18n-ph="promptPlaceholder"></textarea>
+                    <label for="prompt" data-i18n="promptLabel">Prompt</label>
+                    <textarea id="prompt" class="prompt-textarea" placeholder="Describe the image you want to generate..." data-i18n-ph="promptPlaceholder"></textarea>
                 </div>
-
+                
                 <div class="form-group">
-                    <label for="negativePromptInput" class="form-label" data-i18n="negativePromptLabel">Negative Prompt <span class="badge" data-i18n="optional">Optional</span></label>
-                    <textarea id="negativePromptInput" class="negative-prompt-input" placeholder="What you don't want in the image..." data-i18n-ph="negativePromptPlaceholder"></textarea>
+                    <label for="negativePrompt" data-i18n="negativePrompt">Negative Prompt</label>
+                    <textarea id="negativePrompt" class="negative-prompt" placeholder="What you don't want in the image..." data-i18n-ph="negativePromptPlaceholder"></textarea>
                 </div>
-
+                
                 <div class="form-group">
-                    <label for="modelSelect" class="form-label" data-i18n="modelLabel">AI Model</label>
-                    <select id="modelSelect" class="select-input">
-                        <option value="default" data-i18n="modelDefault">Default</option>
-                        <option value="dall-e-3" data-i18n="modelDalle">DALL-E 3</option>
-                        <option value="flux" data-i18n="modelFlux">Flux</option>
-                        <option value="midjourney" data-i18n="modelMidjourney">Midjourney</option>
-                        <option value="stable-diffusion" data-i18n="modelStableDiffusion">Stable Diffusion</option>
+                    <label for="aiModel" data-i18n="aiModel">AI Model</label>
+                    <select id="aiModel">
+                        <option value="default" data-i18n="default">Default</option>
+                        <option value="dall-e-3" data-i18n="dalle3">DALL-E 3</option>
+                        <option value="flux" data-i18n="flux">Flux</option>
+                        <option value="midjourney" data-i18n="midjourney">Midjourney</option>
+                        <option value="stable-diffusion" data-i18n="stableDiffusion">Stable Diffusion</option>
                     </select>
                 </div>
-
+                
                 <div class="form-group">
-                    <label class="form-label" data-i18n="styleLabel">Style</label>
-                    <select id="styleSelect" class="select-input">
-                        <option value="none" data-i18n="styleNone">No Style</option>
-                        <option value="realistic" data-i18n="styleRealistic">Realistic</option>
-                        <option value="digital-art" data-i18n="styleDigitalArt">Digital Art</option>
-                        <option value="anime" data-i18n="styleAnime">Anime Style</option>
-                        <option value="painting" data-i18n="stylePainting">Painting</option>
-                        <option value="photography" data-i18n="stylePhotography">Photography</option>
-                        <option value="watercolor" data-i18n="styleWatercolor">Watercolor</option>
-                        <option value="3d-render" data-i18n="style3dRender">3D Render</option>
-                        <option value="surrealism" data-i18n="styleSurrealism">Surrealism</option>
-                        <option value="3d-disney" data-i18n="style3dDisney">3D Disney Character</option>
-                        <option value="studio-ghibli" data-i18n="styleStudioGhibli">Studio Ghibli</option>
-                        <option value="ukiyo-e" data-i18n="styleUkiyoE">Ukiyo-e</option>
-                        <option value="lowbrow" data-i18n="styleLowbrow">Lowbrow Art</option>
-                        <option value="minimalism" data-i18n="styleMinimalism">Minimalism</option>
-                        <option value="kinetic" data-i18n="styleKinetic">Kinetic Art</option>
-                        <option value="sumi-e" data-i18n="styleSumiE">Sumi-e</option>
-                        <option value="claymation" data-i18n="styleClaymation">Claymation</option>
-                        <option value="brutalism" data-i18n="styleBrutalism">Brutalism</option>
-                        <option value="stained-glass" data-i18n="styleStainedGlass">Stained Glass</option>
-                        <option value="grunge" data-i18n="styleGrunge">Grunge</option>
-                        <option value="horror" data-i18n="styleHorror">Horror</option>
-                        <option value="art-deco" data-i18n="styleArtDeco">Art Deco</option>
-                        <option value="fantasy" data-i18n="styleFantasy">Fantasy Art</option>
-                        <option value="graffiti" data-i18n="styleGraffiti">Graffiti Art</option>
-                        <option value="pixel" data-i18n="stylePixel">Pixel Art</option>
-                        <option value="steampunk" data-i18n="styleSteampunk">Steampunk</option>
-                        <option value="cyberpunk" data-i18n="styleCyberpunk">Cyberpunk</option>
-                        <option value="abstract" data-i18n="styleAbstract">Abstract</option>
-                        <option value="cartoon" data-i18n="styleCartoon">Cartoon</option>
-                        <option value="vintage" data-i18n="styleVintage">Vintage</option>
-                        <option value="gothic" data-i18n="styleGothic">Gothic</option>
-                        <option value="low-poly" data-i18n="styleLowPoly">Low Poly</option>
-                        <option value="pop-art" data-i18n="stylePopArt">Pop Art</option>
-                        <option value="comic" data-i18n="styleComic">Comic Book</option>
-                        <option value="chalk" data-i18n="styleChalk">Chalk Art</option>
-                        <option value="neon-noir" data-i18n="styleNeonNoir">Neon Noir</option>
-                        <option value="amigurumi" data-i18n="styleAmigurumi">Amigurumi</option>
-                        <option value="origami" data-i18n="styleOrigami">Origami</option>
-                        <option value="zentangle" data-i18n="styleZentangle">Zentangle</option>
-                        <option value="glitch" data-i18n="styleGlitch">Glitch Art</option>
-                        <option value="synthwave" data-i18n="styleSynthwave">Synthwave</option>
-                        <option value="art-nouveau" data-i18n="styleArtNouveau">Art Nouveau</option>
-                        <option value="cubism" data-i18n="styleCubism">Cubism</option>
-                        <option value="impressionism" data-i18n="styleImpressionism">Impressionism</option>
-                        <option value="psychedelic" data-i18n="stylePsychedelic">Psychedelic</option>
-                        <option value="dystopian" data-i18n="styleDystopian">Dystopian</option>
+                    <label for="style" data-i18n="style">Style</label>
+                    <select id="style">
+                        <option value="default" data-i18n="default">Default</option>
+                        <option value="realistic" data-i18n="realistic">Realistic</option>
+                        <option value="digital-art" data-i18n="digitalArt">Digital Art</option>
+                        <option value="anime" data-i18n="anime">Anime Style</option>
+                        <option value="photography" data-i18n="photography">Photography</option>
+                        <option value="watercolor" data-i18n="watercolor">Watercolor</option>
+                        <option value="3d-render" data-i18n="3dRender">3D Render</option>
+                        <option value="surrealism" data-i18n="surrealism">Surrealism</option>
+                        <option value="3d-disney" data-i18n="3dDisney">3D Disney Character</option>
+                        <option value="studio-ghibli" data-i18n="studioGhibli">Studio Ghibli</option>
+                        <option value="caricature-3d" data-i18n="caricature3d">Caricature 3D</option>
+                        <option value="cartoon" data-i18n="cartoon">Cartoon</option>
+                        <option value="crayon" data-i18n="crayon">Crayon Drawing</option>
+                        <option value="funny-photo" data-i18n="funnyPhoto">Funny Photo</option>
+                        <option value="graffiti" data-i18n="graffiti">Graffiti Art</option>
+                        <option value="pixel-art" data-i18n="pixelArt">Pixel Art</option>
+                        <option value="steampunk" data-i18n="steampunk">Steampunk</option>
+                        <option value="cyberpunk" data-i18n="cyberpunk">Cyberpunk</option>
                     </select>
                 </div>
-
+                
                 <div class="form-group">
-                    <label for="aspectRatioSelect" class="form-label" data-i18n="aspectRatioLabel">Aspect Ratio</label>
-                    <select id="aspectRatioSelect" class="select-input">
-                        <option value="1:1" data-i18n="ratioSquare">Square (1:1)</option>
-                        <option value="4:3" data-i18n="ratioStandard">Standard (4:3)</option>
-                        <option value="16:9" selected data-i18n="ratioWidescreen">Widescreen (16:9)</option>
-                        <option value="9:16" data-i18n="ratioPortrait">Portrait (9:16)</option>
-                        <option value="3:2" data-i18n="ratioClassic">Classic (3:2)</option>
-                        <option value="2:3" data-i18n="ratioTall">Tall (2:3)</option>
+                    <label for="aspectRatio" data-i18n="aspectRatio">Aspect Ratio</label>
+                    <select id="aspectRatio">
+                        <option value="1:1">1:1 (3000×3000)</option>
+                        <option value="2:3">2:3 (2000×3000)</option>
+                        <option value="3:4">3:4 (3000×4000)</option>
+                        <option value="9:16">9:16 (2250×4000)</option>
+                        <option value="3:2">3:2 (3000×2000)</option>
+                        <option value="4:3">4:3 (4000×3000)</option>
+                        <option value="16:9">16:9 (4000×2250)</option>
+                        <option value="21:9">21:9 (5120×2160)</option>
                     </select>
                 </div>
-
+                
                 <div class="form-group">
-                    <label class="form-label" data-i18n="enhancementLabel">Enhancement</label>
-                    <select id="enhancementSelect" class="select-input">
-                        <option value="none" data-i18n="enhanceNone">None</option>
-                        <option value="hdr" data-i18n="enhanceHDR">HDR+</option>
-                        <option value="ultra-detail" data-i18n="enhanceUltra">Detail Ultra</option>
-                        <option value="cinematic" data-i18n="enhanceCinematic">Cinematic</option>
-                        <option value="neon" data-i18n="enhanceNeon">Neon Glow</option>
-                        <option value="photorealistic" data-i18n="enhancePhoto">Photorealistic</option>
-                        <option value="drama" data-i18n="enhanceDrama">Drama Light</option>
+                    <label for="lightEnhancement" data-i18n="lightEnhancement">Light Enhancement</label>
+                    <select id="lightEnhancement">
+                        <option value="none" data-i18n="none">None</option>
+                        <option value="hdr+" data-i18n="hdrPlus">HDR+</option>
+                        <option value="detail-ultra" data-i18n="detailUltra">Detail Ultra</option>
+                        <option value="cinematic" data-i18n="cinematic">Cinematic</option>
+                        <option value="neon-glow" data-i18n="neonGlow">Neon Glow</option>
+                        <option value="photorealistic" data-i18n="photorealistic">Photorealistic</option>
+                        <option value="drama-light" data-i18n="dramaLight">Drama Light</option>
                     </select>
                 </div>
-
+                
                 <div class="form-group">
-                    <label class="form-label" data-i18n="extraFeaturesLabel">Extra Features</label>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="extraNone" name="extraFeatures" value="none" class="radio-input" checked>
-                            <label for="extraNone" class="radio-label" data-i18n="extraNone">None</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="extraAnimation" name="extraFeatures" value="animation" class="radio-input">
-                            <label for="extraAnimation" class="radio-label" data-i18n="extraAnimation">Animation</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="extraTransparency" name="extraFeatures" value="transparency" class="radio-input">
-                            <label for="extraTransparency" class="radio-label" data-i18n="extraTransparency">Transparency</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="extraTiltShift" name="extraFeatures" value="tilt-shift" class="radio-input">
-                            <label for="extraTiltShift" class="radio-label" data-i18n="extraTiltShift">Tilt-Shift</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="extraHologram" name="extraFeatures" value="hologram" class="radio-input">
-                            <label for="extraHologram" class="radio-label" data-i18n="extraHologram">Hologram</label>
-                        </div>
+                    <label for="additionalFeatures" data-i18n="additionalFeatures">Additional Features</label>
+                    <select id="additionalFeatures">
+                        <option value="none" data-i18n="none">None</option>
+                        <option value="animation" data-i18n="animation">Animation</option>
+                        <option value="transparency" data-i18n="transparency">Transparency</option>
+                        <option value="tilt-shift" data-i18n="tiltShift">Tilt-Shift</option>
+                        <option value="hologram" data-i18n="hologram">Hologram</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="upscaling" data-i18n="upscaling">Upscaling</label>
+                    <select id="upscaling">
+                        <option value="none" data-i18n="none">None</option>
+                        <option value="hd" data-i18n="hd">HD (1280×720)</option>
+                        <option value="fhd" data-i18n="fhd">FHD (1920×1080)</option>
+                        <option value="4k" data-i18n="4k">4K (3840×2160)</option>
+                    </select>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="nsfwContent">
+                    <label for="nsfwContent" data-i18n="nsfwContent">NSFW Content</label>
+                    <div class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext" data-i18n="nsfwTooltip">Enable this if you want to allow potentially NSFW content in the generated images</span>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="nsfwCheckbox" class="checkbox-input">
-                        <label for="nsfwCheckbox" class="checkbox-label" data-i18n="nsfwLabel">Allow NSFW Content</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="ultraEnhanceCheckbox" class="checkbox-input">
-                        <label for="ultraEnhanceCheckbox" class="checkbox-label" data-i18n="ultraEnhanceLabel">Ultra Enhance AI</label>
-                    </div>
-                </div>
-
+                
                 <div class="advanced-settings">
-                    <div class="accordion">
-                        <div class="accordion-header" id="advancedHeader" data-i18n="advancedSettings">
-                            Advanced Settings <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <div class="accordion-header" id="advancedSettingsToggle">
+                        <span data-i18n="advancedSettings">Advanced Settings</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content" id="advancedSettingsContent">
+                        <div class="form-group">
+                            <label data-i18n="colorPalette">Color Palette</label>
+                            <div class="color-palette">
+                                <div class="color-option selected" style="background: linear-gradient(to right, #6c5ce7, #a29bfe);" data-value="default" title="Default"></div>
+                                <div class="color-option" style="background: linear-gradient(to right, #ff7675, #fd79a8);" data-value="vibrant" title="Vibrant"></div>
+                                <div class="color-option" style="background: linear-gradient(to right, #a8e6cf, #dcedc1);" data-value="pastel" title="Pastel"></div>
+                                <div class="color-option" style="background: linear-gradient(to right, #b2b2b2, #636e72);" data-value="monochrome" title="Monochrome"></div>
+                                <div class="color-option" style="background: linear-gradient(to right, #ffbe76, #fdcb6e);" data-value="warm" title="Warm Tones"></div>
+                                <div class="color-option" style="background: linear-gradient(to right, #74b9ff, #0984e3);" data-value="cool" title="Cool Tones"></div>
+                            </div>
                         </div>
-                        <div class="accordion-content">
-                            <div class="form-group" style="margin-top: 1rem;">
-                                <label class="form-label" data-i18n="colorPaletteLabel">Color Palette</label>
-                                <div class="radio-group">
-                                    <div class="radio-item">
-                                        <input type="radio" id="colorDefault" name="colorPalette" value="default" class="radio-input" checked>
-                                        <label for="colorDefault" class="radio-label" data-i18n="colorDefault">Default</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="colorVibrant" name="colorPalette" value="vibrant" class="radio-input">
-                                        <label for="colorVibrant" class="radio-label" data-i18n="colorVibrant">Vibrant</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="colorPastel" name="colorPalette" value="pastel" class="radio-input">
-                                        <label for="colorPastel" class="radio-label" data-i18n="colorPastel">Pastel</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="colorMonochrome" name="colorPalette" value="monochrome" class="radio-input">
-                                        <label for="colorMonochrome" class="radio-label" data-i18n="colorMonochrome">Monochrome</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="colorWarm" name="colorPalette" value="warm" class="radio-input">
-                                        <label for="colorWarm" class="radio-label" data-i18n="colorWarm">Warm Tones</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="colorCool" name="colorPalette" value="cool" class="radio-input">
-                                        <label for="colorCool" class="radio-label" data-i18n="colorCool">Cool Tones</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" data-i18n="compositionLabel">Composition</label>
-                                <div class="radio-group">
-                                    <div class="radio-item">
-                                        <input type="radio" id="compDefault" name="composition" value="default" class="radio-input" checked>
-                                        <label for="compDefault" class="radio-label" data-i18n="compDefault">Default</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="compCloseUp" name="composition" value="close-up" class="radio-input">
-                                        <label for="compCloseUp" class="radio-label" data-i18n="compCloseUp">Close-up</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="compWide" name="composition" value="wide" class="radio-input">
-                                        <label for="compWide" class="radio-label" data-i18n="compWide">Wide Shot</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="compMacro" name="composition" value="macro" class="radio-input">
-                                        <label for="compMacro" class="radio-label" data-i18n="compMacro">Macro</label>
-                                    </div>
-                                    <div class="radio-item">
-                                        <input type="radio" id="compAerial" name="composition" value="aerial" class="radio-input">
-                                        <label for="compAerial" class="radio-label" data-i18n="compAerial">Aerial</label>
-                                    </div>
-                                </div>
-                            </div>
+                        
+                        <div class="form-group">
+                            <label for="composition" data-i18n="composition">Composition</label>
+                            <select id="composition">
+                                <option value="default" data-i18n="default">Default</option>
+                                <option value="close-up" data-i18n="closeUp">Close-up</option>
+                                <option value="wide-shot" data-i18n="wideShot">Wide Shot</option>
+                                <option value="macro" data-i18n="macro">Macro</option>
+                                <option value="aerial" data-i18n="aerial">Aerial</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-
-                <div class="btn-group">
-                    <button id="generateBtn" class="btn btn-primary btn-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                        <span data-i18n="generateBtn">Generate</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="gallery-container">
-                <div id="gallery" class="gallery">
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                        </div>
-                        <h3 class="empty-text" data-i18n="emptyTitle">No images generated yet</h3>
-                        <p data-i18n="emptySubtitle">Enter a prompt and click generate to create your first AI artwork!</p>
+                
+                <button class="btn" id="generateBtn" data-i18n="generateImage">Generate Image</button>
+            </section>
+            
+            <section class="results-section">
+                <div class="history-panel">
+                    <h2 class="panel-title"><i class="fas fa-history"></i> <span data-i18n="promptHistory">Prompt History</span></h2>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="clearHistoryBtn" data-i18n="clearHistory">Clear History</button>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <!-- History items will be added here dynamically -->
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="history-panel">
-            <h2 class="panel-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 16 12 14 15 10 9 8 12 2 12"></polyline>
-                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                </svg>
-                <span data-i18n="historyTitle">Prompt History</span>
-            </h2>
-            <div class="history-list" id="historyList"></div>
-            <div class="history-actions">
-                <button id="clearHistoryBtn" class="btn btn-secondary" data-i18n="clearHistory">Clear History</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p data-i18n="copyright">© 2025 DERY AI GENERATOR | Powered by Pollinations API | Developed by Dery Lau | Thanks to GitHub & Cloudflare</p>
-        </div>
+                
+                <div class="gallery" id="gallery">
+                    <!-- Generated images will be added here -->
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p data-i18n="copyright">© 2025 DERY AI GENERATOR | Powered by Pollinations API | Developed by Dery Lau | Thanks to Github & Cloudflare</p>
+        </footer>
     </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    
+    <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text" data-i18n="loadingText">DERY AI Loading</div>
+        <div class="loading-text">DERY AI Loading</div>
     </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
-
-    <!-- Share Modal -->
+    
     <div class="share-modal" id="shareModal">
         <div class="share-content">
-            <button class="share-close" id="shareClose">&times;</button>
-            <h3 class="share-title" data-i18n="shareTitle">Share Your Creation</h3>
-            <div class="share-buttons">
-                <button class="share-btn" id="shareFacebook">
-                    <div class="share-icon share-facebook">f</div>
-                    <span class="share-label">Facebook</span>
-                </button>
-                <button class="share-btn" id="shareTwitter">
-                    <div class="share-icon share-twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-                        </svg>
+            <button class="close-modal" id="closeShareModal">&times;</button>
+            <h2 class="share-title" data-i18n="shareImage">Share Image</h2>
+            <div class="share-options">
+                <div class="share-option" data-platform="facebook">
+                    <div class="share-icon facebook">
+                        <i class="fab fa-facebook-f"></i>
                     </div>
-                    <span class="share-label">Twitter</span>
-                </button>
-                <button class="share-btn" id="shareWhatsapp">
-                    <div class="share-icon share-whatsapp">w</div>
-                    <span class="share-label">WhatsApp</span>
-                </button>
-                <button class="share-btn" id="shareTiktok">
-                    <div class="share-icon share-tiktok">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 7.34a8.16 8.16 0 0 1-.53 2.75 6.3 6.3 0 0 1-1.28 2.09 6 6 0 0 1-2.06 1.54A6.36 6.36 0 0 1 15 14.34a6.11 6.11 0 0 1-2.37-.47v4.7a9.73 9.73 0 0 1-2.22.28 9.88 9.88 0 0 1-2.22-.16 9.4 9.4 0 0 1-2-.56 8.63 8.63 0 0 1-1.72-1 7.71 7.71 0 0 1-1.19-1.25 7.59 7.59 0 0 1-.84-1.41 8.19 8.19 0 0 1-.47-1.5 9.84 9.84 0 0 1-.16-1.53 10.15 10.15 0 0 1 0-1.53 8.19 8.19 0 0 1 .47-1.5 7.59 7.59 0 0 1 .84-1.41 7.71 7.71 0 0 1 1.19-1.25 8.63 8.63 0 0 1 1.72-1 9.4 9.4 0 0 1 2-.56 9.88 9.88 0 0 1 2.22-.16 9.73 9.73 0 0 1 2.22.28v4.7a6.11 6.11 0 0 0-2.37-.47 6.36 6.36 0 0 0-2.13.37 6 6 0 0 0-1.78 1.09 6.3 6.3 0 0 0-1.28 2.09 6.16 6.16 0 0 0-.53 2.75 6.16 6.16 0 0 0 .53 2.75 6.3 6.3 0 0 0 1.28 2.09 6 6 0 0 0 1.78 1.09 6.36 6.36 0 0 0 2.13.37 6.11 6.11 0 0 0 2.37-.47v-8.4h4.69v1.88z"></path>
-                        </svg>
+                    <span>Facebook</span>
+                </div>
+                <div class="share-option" data-platform="twitter">
+                    <div class="share-icon twitter">
+                        <i class="fab fa-twitter"></i>
                     </div>
-                    <span class="share-label">TikTok</span>
-                </button>
-                <button class="share-btn" id="shareLink">
-                    <div class="share-icon share-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                        </svg>
+                    <span>Twitter</span>
+                </div>
+                <div class="share-option" data-platform="whatsapp">
+                    <div class="share-icon whatsapp">
+                        <i class="fab fa-whatsapp"></i>
                     </div>
-                    <span class="share-label">Copy Link</span>
-                </button>
+                    <span>WhatsApp</span>
+                </div>
+                <div class="share-option" data-platform="instagram">
+                    <div class="share-icon instagram">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <span>Instagram</span>
+                </div>
+                <div class="share-option" data-platform="tiktok">
+                    <div class="share-icon tiktok">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <span>TikTok</span>
+                </div>
+                <div class="share-option" data-platform="reddit">
+                    <div class="share-icon reddit">
+                        <i class="fab fa-reddit-alien"></i>
+                    </div>
+                    <span>Reddit</span>
+                </div>
+                <div class="share-option" data-platform="pinterest">
+                    <div class="share-icon pinterest">
+                        <i class="fab fa-pinterest-p"></i>
+                    </div>
+                    <span>Pinterest</span>
+                </div>
+                <div class="share-option" data-platform="telegram">
+                    <div class="share-icon telegram">
+                        <i class="fab fa-telegram-plane"></i>
+                    </div>
+                    <span>Telegram</span>
+                </div>
             </div>
-            <div class="share-input-group">
-                <input type="text" class="share-input" id="shareUrl" readonly>
-                <button class="share-copy" id="shareCopy" data-i18n="copy">Copy</button>
+            <div class="share-link">
+                <input type="text" id="shareUrl" readonly>
+                <button class="copy-link" id="copyShareUrl" data-i18n="copy">Copy</button>
             </div>
         </div>
     </div>
-
+    
+    <div class="toast" id="toast"></div>
+    
     <script>
-        // Internationalization
+        // Language support
         const translations = {
             en: {
-                subtitle: "Advanced AI Image & Text Generator",
-                controlPanel: "Control Panel",
+                settings: "Settings",
                 promptLabel: "Prompt",
                 promptPlaceholder: "Describe the image you want to generate...",
-                negativePromptLabel: "Negative Prompt",
+                negativePrompt: "Negative Prompt",
                 negativePromptPlaceholder: "What you don't want in the image...",
-                modelLabel: "AI Model",
-                modelDefault: "Default",
-                modelDalle: "DALL-E 3",
-                modelFlux: "Flux",
-                modelMidjourney: "Midjourney",
-                modelStableDiffusion: "Stable Diffusion",
-                styleLabel: "Style",
-                styleNone: "No Style",
-                styleRealistic: "Realistic",
-                styleDigitalArt: "Digital Art",
-                styleAnime: "Anime Style",
-                stylePainting: "Painting",
-                stylePhotography: "Photography",
-                styleWatercolor: "Watercolor",
-                style3dRender: "3D Render",
-                styleSurrealism: "Surrealism",
-                style3dDisney: "3D Disney Character",
-                styleStudioGhibli: "Studio Ghibli",
-                styleUkiyoE: "Ukiyo-e",
-                styleLowbrow: "Lowbrow Art",
-                styleMinimalism: "Minimalism",
-                styleKinetic: "Kinetic Art",
-                styleSumiE: "Sumi-e",
-                styleClaymation: "Claymation",
-                styleBrutalism: "Brutalism",
-                styleStainedGlass: "Stained Glass",
-                styleGrunge: "Grunge",
-                styleHorror: "Horror",
-                styleArtDeco: "Art Deco",
-                styleFantasy: "Fantasy Art",
-                styleGraffiti: "Graffiti Art",
-                stylePixel: "Pixel Art",
-                styleSteampunk: "Steampunk",
-                styleCyberpunk: "Cyberpunk",
-                styleAbstract: "Abstract",
-                styleCartoon: "Cartoon",
-                styleVintage: "Vintage",
-                styleGothic: "Gothic",
-                styleLowPoly: "Low Poly",
-                stylePopArt: "Pop Art",
-                styleComic: "Comic Book",
-                styleChalk: "Chalk Art",
-                styleNeonNoir: "Neon Noir",
-                styleAmigurumi: "Amigurumi",
-                styleOrigami: "Origami",
-                styleZentangle: "Zentangle",
-                styleGlitch: "Glitch Art",
-                styleSynthwave: "Synthwave",
-                styleArtNouveau: "Art Nouveau",
-                styleCubism: "Cubism",
-                styleImpressionism: "Impressionism",
-                stylePsychedelic: "Psychedelic",
-                styleDystopian: "Dystopian",
-                aspectRatioLabel: "Aspect Ratio",
-                ratioSquare: "Square (1:1)",
-                ratioStandard: "Standard (4:3)",
-                ratioWidescreen: "Widescreen (16:9)",
-                ratioPortrait: "Portrait (9:16)",
-                ratioClassic: "Classic (3:2)",
-                ratioTall: "Tall (2:3)",
-                enhancementLabel: "Enhancement",
-                enhanceNone: "None",
-                enhanceHDR: "HDR+",
-                enhanceUltra: "Detail Ultra",
-                enhanceCinematic: "Cinematic",
-                enhanceNeon: "Neon Glow",
-                enhancePhoto: "Photorealistic",
-                enhanceDrama: "Drama Light",
-                extraFeaturesLabel: "Extra Features",
-                extraNone: "None",
-                extraAnimation: "Animation",
-                extraTransparency: "Transparency",
-                extraTiltShift: "Tilt-Shift",
-                extraHologram: "Hologram",
-                nsfwLabel: "Allow NSFW Content",
-                ultraEnhanceLabel: "Ultra Enhance AI",
+                aiModel: "AI Model",
+                default: "Default",
+                dalle3: "DALL-E 3",
+                flux: "Flux",
+                midjourney: "Midjourney",
+                stableDiffusion: "Stable Diffusion",
+                style: "Style",
+                realistic: "Realistic",
+                digitalArt: "Digital Art",
+                anime: "Anime Style",
+                photography: "Photography",
+                watercolor: "Watercolor",
+                "3dRender": "3D Render",
+                surrealism: "Surrealism",
+                "3dDisney": "3D Disney Character",
+                studioGhibli: "Studio Ghibli",
+                caricature3d: "Caricature 3D",
+                cartoon: "Cartoon",
+                crayon: "Crayon Drawing",
+                funnyPhoto: "Funny Photo",
+                graffiti: "Graffiti Art",
+                pixelArt: "Pixel Art",
+                steampunk: "Steampunk",
+                cyberpunk: "Cyberpunk",
+                aspectRatio: "Aspect Ratio",
+                lightEnhancement: "Light Enhancement",
+                none: "None",
+                hdrPlus: "HDR+",
+                detailUltra: "Detail Ultra",
+                cinematic: "Cinematic",
+                neonGlow: "Neon Glow",
+                photorealistic: "Photorealistic",
+                dramaLight: "Drama Light",
+                additionalFeatures: "Additional Features",
+                animation: "Animation",
+                transparency: "Transparency",
+                tiltShift: "Tilt-Shift",
+                hologram: "Hologram",
+                upscaling: "Upscaling",
+                hd: "HD (1280×720)",
+                fhd: "FHD (1920×1080)",
+                "4k": "4K (3840×2160)",
+                nsfwContent: "NSFW Content",
+                nsfwTooltip: "Enable this if you want to allow potentially NSFW content in the generated images",
                 advancedSettings: "Advanced Settings",
-                colorPaletteLabel: "Color Palette",
-                colorDefault: "Default",
-                colorVibrant: "Vibrant",
-                colorPastel: "Pastel",
-                colorMonochrome: "Monochrome",
-                colorWarm: "Warm Tones",
-                colorCool: "Cool Tones",
-                compositionLabel: "Composition",
-                compDefault: "Default",
-                compCloseUp: "Close-up",
-                compWide: "Wide Shot",
-                compMacro: "Macro",
-                compAerial: "Aerial",
-                generateBtn: "Generate",
-                historyTitle: "Prompt History",
+                colorPalette: "Color Palette",
+                composition: "Composition",
+                closeUp: "Close-up",
+                wideShot: "Wide Shot",
+                macro: "Macro",
+                aerial: "Aerial",
+                generateImage: "Generate Image",
+                promptHistory: "Prompt History",
                 clearHistory: "Clear History",
-                emptyTitle: "No images generated yet",
-                emptySubtitle: "Enter a prompt and click generate to create your first AI artwork!",
-                loadingText: "DERY AI Loading",
-                shareTitle: "Share Your Creation",
+                shareImage: "Share Image",
                 copy: "Copy",
-                optional: "Optional",
-                copyright: "© 2025 DERY AI GENERATOR | Powered by Pollinations API | Developed by Dery Lau | Thanks to GitHub & Cloudflare",
-                successGenerate: "Image generated successfully!",
-                errorGenerate: "Failed to generate image. Please try again.",
-                errorEmptyPrompt: "Please enter a prompt to generate an image.",
+                copyright: "© 2025 DERY AI GENERATOR | Powered by Pollinations API | Developed by Dery Lau | Thanks to Github & Cloudflare",
                 confirmClearHistory: "Are you sure you want to clear your prompt history?",
-                copiedToClipboard: "Copied to clipboard!"
+                generating: "Generating your image...",
+                generationSuccess: "Image generated successfully!",
+                generationError: "Failed to generate image. Please try again.",
+                copied: "Copied to clipboard!",
+                shareError: "Failed to generate share link.",
+                emptyPrompt: "Please enter a prompt to generate an image."
             },
             id: {
-                subtitle: "Generator Gambar & Teks AI Canggih",
-                controlPanel: "Panel Kontrol",
+                settings: "Pengaturan",
                 promptLabel: "Prompt",
-                promptPlaceholder: "Deskripsikan gambar yang ingin Anda buat...",
-                negativePromptLabel: "Negatif Prompt",
+                promptPlaceholder: "Jelaskan gambar yang ingin Anda hasilkan...",
+                negativePrompt: "Prompt Negatif",
                 negativePromptPlaceholder: "Apa yang tidak Anda inginkan dalam gambar...",
-                modelLabel: "Model AI",
-                modelDefault: "Default",
-                modelDalle: "DALL-E 3",
-                modelFlux: "Flux",
-                modelMidjourney: "Midjourney",
-                modelStableDiffusion: "Stable Diffusion",
-                styleLabel: "Gaya",
-                styleNone: "Tanpa Gaya",
-                styleRealistic: "Realistis",
-                styleDigitalArt: "Seni Digital",
-                styleAnime: "Gaya Anime",
-                stylePainting: "Lukisan",
-                stylePhotography: "Fotografi",
-                styleWatercolor: "Cat Air",
-                style3dRender: "Render 3D",
-                styleSurrealism: "Surealisme",
-                style3dDisney: "Karakter Disney 3D",
-                styleStudioGhibli: "Studio Ghibli",
-                styleUkiyoE: "Ukiyo-e",
-                styleLowbrow: "Seni Lowbrow",
-                styleMinimalism: "Minimalisme",
-                styleKinetic: "Seni Kinetik",
-                styleSumiE: "Sumi-e",
-                styleClaymation: "Claymation",
-                styleBrutalism: "Brutalisme",
-                styleStainedGlass: "Kaca Patri",
-                styleGrunge: "Grunge",
-                styleHorror: "Horor",
-                styleArtDeco: "Art Deco",
-                styleFantasy: "Seni Fantasi",
-                styleGraffiti: "Seni Graffiti",
-                stylePixel: "Seni Pixel",
-                styleSteampunk: "Steampunk",
-                styleCyberpunk: "Cyberpunk",
-                styleAbstract: "Abstrak",
-                styleCartoon: "Kartun",
-                styleVintage: "Vintage",
-                styleGothic: "Gotik",
-                styleLowPoly: "Low Poly",
-                stylePopArt: "Pop Art",
-                styleComic: "Buku Komik",
-                styleChalk: "Seni Kapur",
-                styleNeonNoir: "Neon Noir",
-                styleAmigurumi: "Amigurumi",
-                styleOrigami: "Origami",
-                styleZentangle: "Zentangle",
-                styleGlitch: "Seni Glitch",
-                styleSynthwave: "Synthwave",
-                styleArtNouveau: "Art Nouveau",
-                styleCubism: "Kubisme",
-                styleImpressionism: "Impresionisme",
-                stylePsychedelic: "Psikedelik",
-                styleDystopian: "Distopia",
-                aspectRatioLabel: "Rasio Aspek",
-                ratioSquare: "Persegi (1:1)",
-                ratioStandard: "Standar (4:3)",
-                ratioWidescreen: "Layar Lebar (16:9)",
-                ratioPortrait: "Portrait (9:16)",
-                ratioClassic: "Klasik (3:2)",
-                ratioTall: "Tinggi (2:3)",
-                enhancementLabel: "Peningkatan",
-                enhanceNone: "Tidak Ada",
-                enhanceHDR: "HDR+",
-                enhanceUltra: "Detail Ultra",
-                enhanceCinematic: "Sinematik",
-                enhanceNeon: "Cahaya Neon",
-                enhancePhoto: "Fotorealistik",
-                enhanceDrama: "Cahaya Dramatis",
-                extraFeaturesLabel: "Fitur Tambahan",
-                extraNone: "Tidak Ada",
-                extraAnimation: "Animasi",
-                extraTransparency: "Transparansi",
-                extraTiltShift: "Tilt-Shift",
-                extraHologram: "Hologram",
-                nsfwLabel: "Izinkan Konten NSFW",
-                ultraEnhanceLabel: "Peningkatan Ultra AI",
+                aiModel: "Model AI",
+                default: "Default",
+                dalle3: "DALL-E 3",
+                flux: "Flux",
+                midjourney: "Midjourney",
+                stableDiffusion: "Stable Diffusion",
+                style: "Gaya",
+                realistic: "Realistis",
+                digitalArt: "Seni Digital",
+                anime: "Gaya Anime",
+                photography: "Fotografi",
+                watercolor: "Cat Air",
+                "3dRender": "Render 3D",
+                surrealism: "Surealisme",
+                "3dDisney": "Karakter Disney 3D",
+                studioGhibli: "Studio Ghibli",
+                caricature3d: "Karikatur 3D",
+                cartoon: "Kartun",
+                crayon: "Gambar Krayon",
+                funnyPhoto: "Foto Lucu",
+                graffiti: "Seni Graffiti",
+                pixelArt: "Pixel Art",
+                steampunk: "Steampunk",
+                cyberpunk: "Cyberpunk",
+                aspectRatio: "Rasio Aspek",
+                lightEnhancement: "Peningkatan Cahaya",
+                none: "Tidak Ada",
+                hdrPlus: "HDR+",
+                detailUltra: "Detail Ultra",
+                cinematic: "Sinematik",
+                neonGlow: "Cahaya Neon",
+                photorealistic: "Fotorealistik",
+                dramaLight: "Cahaya Dramatis",
+                additionalFeatures: "Fitur Tambahan",
+                animation: "Animasi",
+                transparency: "Transparansi",
+                tiltShift: "Tilt-Shift",
+                hologram: "Hologram",
+                upscaling: "Peningkatan Resolusi",
+                hd: "HD (1280×720)",
+                fhd: "FHD (1920×1080)",
+                "4k": "4K (3840×2160)",
+                nsfwContent: "Konten NSFW",
+                nsfwTooltip: "Aktifkan ini jika Anda ingin mengizinkan konten yang berpotensi NSFW dalam gambar yang dihasilkan",
                 advancedSettings: "Pengaturan Lanjutan",
-                colorPaletteLabel: "Palet Warna",
-                colorDefault: "Default",
-                colorVibrant: "Vibrant",
-                colorPastel: "Pastel",
-                colorMonochrome: "Monokrom",
-                colorWarm: "Warna Hangat",
-                colorCool: "Warna Dingin",
-                compositionLabel: "Komposisi",
-                compDefault: "Default",
-                compCloseUp: "Close-up",
-                compWide: "Wide Shot",
-                compMacro: "Makro",
-                compAerial: "Udara",
-                generateBtn: "Buat",
-                historyTitle: "Riwayat Prompt",
+                colorPalette: "Palet Warna",
+                composition: "Komposisi",
+                closeUp: "Close-up",
+                wideShot: "Wide Shot",
+                macro: "Makro",
+                aerial: "Udara",
+                generateImage: "Hasilkan Gambar",
+                promptHistory: "Riwayat Prompt",
                 clearHistory: "Hapus Riwayat",
-                emptyTitle: "Belum ada gambar yang dibuat",
-                emptySubtitle: "Masukkan prompt dan klik buat untuk membuat karya AI pertama Anda!",
-                loadingText: "DERY AI Memuat",
-                shareTitle: "Bagikan Karya Anda",
+                shareImage: "Bagikan Gambar",
                 copy: "Salin",
-                optional: "Opsional",
-                copyright: "© 2025 DERY AI GENERATOR | Didukung oleh Pollinations API | Dikembangkan oleh Dery Lau | Terima kasih untuk GitHub & Cloudflare",
-                successGenerate: "Gambar berhasil dibuat!",
-                errorGenerate: "Gagal membuat gambar. Silakan coba lagi.",
-                errorEmptyPrompt: "Masukkan prompt untuk membuat gambar.",
-                confirmClearHistory: "Anda yakin ingin menghapus riwayat prompt?",
-                copiedToClipboard: "Disalin ke clipboard!"
+                copyright: "© 2025 DERY AI GENERATOR | Didukung oleh Pollinations API | Dikembangkan oleh Dery Lau | Terima kasih kepada Github & Cloudflare",
+                confirmClearHistory: "Apakah Anda yakin ingin menghapus riwayat prompt?",
+                generating: "Menghasilkan gambar Anda...",
+                generationSuccess: "Gambar berhasil dihasilkan!",
+                generationError: "Gagal menghasilkan gambar. Silakan coba lagi.",
+                copied: "Disalin ke clipboard!",
+                shareError: "Gagal membuat tautan berbagi.",
+                emptyPrompt: "Masukkan prompt untuk menghasilkan gambar."
             }
         };
 
-        // DOM Elements
+        // Current language
+        let currentLanguage = 'en';
+        const languageToggle = document.getElementById('languageToggle');
+        const currentLanguageSpan = document.getElementById('currentLanguage');
+
+        // Theme toggle
         const themeToggle = document.getElementById('themeToggle');
-        const langButtons = document.querySelectorAll('.lang-btn');
-        const promptInput = document.getElementById('promptInput');
-        const negativePromptInput = document.getElementById('negativePromptInput');
-        const modelSelect = document.getElementById('modelSelect');
-        const styleSelect = document.getElementById('styleSelect');
-        const aspectRatioSelect = document.getElementById('aspectRatioSelect');
-        const enhancementSelect = document.getElementById('enhancementSelect');
-        const nsfwCheckbox = document.getElementById('nsfwCheckbox');
-        const ultraEnhanceCheckbox = document.getElementById('ultraEnhanceCheckbox');
+        const html = document.documentElement;
+
+        // Form elements
+        const promptInput = document.getElementById('prompt');
+        const negativePromptInput = document.getElementById('negativePrompt');
+        const aiModelSelect = document.getElementById('aiModel');
+        const styleSelect = document.getElementById('style');
+        const aspectRatioSelect = document.getElementById('aspectRatio');
+        const lightEnhancementSelect = document.getElementById('lightEnhancement');
+        const additionalFeaturesSelect = document.getElementById('additionalFeatures');
+        const upscalingSelect = document.getElementById('upscaling');
+        const nsfwCheckbox = document.getElementById('nsfwContent');
         const generateBtn = document.getElementById('generateBtn');
-        const gallery = document.getElementById('gallery');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const compositionSelect = document.getElementById('composition');
+
+        // History elements
         const historyList = document.getElementById('historyList');
         const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const toast = document.getElementById('toast');
-        const shareModal = document.getElementById('shareModal');
-        const shareClose = document.getElementById('shareClose');
-        const shareUrl = document.getElementById('shareUrl');
-        const shareCopy = document.getElementById('shareCopy');
-        const advancedHeader = document.getElementById('advancedHeader');
-        const accordion = document.querySelector('.accordion');
 
-        // Current language
-        let currentLang = 'en';
+        // Gallery
+        const gallery = document.getElementById('gallery');
+
+        // Loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Share modal
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModal = document.getElementById('closeShareModal');
+        const shareOptions = document.querySelectorAll('.share-option');
+        const shareUrlInput = document.getElementById('shareUrl');
+        const copyShareUrl = document.getElementById('copyShareUrl');
+
+        // Toast
+        const toast = document.getElementById('toast');
+
+        // Advanced settings
+        const advancedSettingsToggle = document.getElementById('advancedSettingsToggle');
+        const advancedSettingsContent = document.getElementById('advancedSettingsContent');
 
         // Initialize the app
         function init() {
             // Load saved theme preference
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                html.setAttribute('data-theme', savedTheme);
+                updateThemeIcon(savedTheme);
+            }
+
             // Load saved language preference
-            const savedLang = localStorage.getItem('language') || 'en';
-            setLanguage(savedLang);
-            
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage) {
+                currentLanguage = savedLanguage;
+                currentLanguageSpan.textContent = currentLanguage.toUpperCase();
+                updateTranslations(currentLanguage);
+            }
+
             // Load history from localStorage
             loadHistory();
-            
+
             // Set up event listeners
             setupEventListeners();
         }
@@ -1486,306 +1264,337 @@
         function setupEventListeners() {
             // Theme toggle
             themeToggle.addEventListener('click', toggleTheme);
-            
-            // Language switcher
-            langButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const lang = btn.dataset.lang;
-                    setLanguage(lang);
-                });
-            });
-            
+
+            // Language toggle
+            languageToggle.addEventListener('click', toggleLanguage);
+
             // Generate button
             generateBtn.addEventListener('click', generateImage);
-            
+
             // Clear history button
             clearHistoryBtn.addEventListener('click', clearHistory);
-            
-            // Share modal
-            shareClose.addEventListener('click', () => {
-                shareModal.classList.remove('show');
-            });
-            
-            // Share copy button
-            shareCopy.addEventListener('click', copyShareUrl);
-            
-            // Share buttons
-            document.getElementById('shareFacebook').addEventListener('click', () => shareOnSocial('facebook'));
-            document.getElementById('shareTwitter').addEventListener('click', () => shareOnSocial('twitter'));
-            document.getElementById('shareWhatsapp').addEventListener('click', () => shareOnSocial('whatsapp'));
-            document.getElementById('shareTiktok').addEventListener('click', () => shareOnSocial('tiktok'));
-            document.getElementById('shareLink').addEventListener('click', () => shareOnSocial('link'));
-            
-            // Accordion
-            advancedHeader.addEventListener('click', () => {
-                accordion.classList.toggle('active');
-            });
-            
-            // Allow pressing Enter in prompt input to generate
-            promptInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    generateImage();
-                }
-            });
-        }
 
-        // Toggle between dark and light theme
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-
-        // Set language
-        function setLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('language', lang);
-            
-            // Update active button
-            langButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.lang === lang);
-            });
-            
-            // Update all translatable elements
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                el.textContent = translations[lang][key];
-            });
-            
-            // Update placeholders
-            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-                const key = el.getAttribute('data-i18n-ph');
-                el.setAttribute('placeholder', translations[lang][key]);
-            });
-            
-            // Update select options
-            updateSelectOptions();
-        }
-
-        // Update select options based on current language
-        function updateSelectOptions() {
-            const selects = [
-                { element: modelSelect, prefix: 'model' },
-                { element: styleSelect, prefix: 'style' },
-                { element: aspectRatioSelect, prefix: 'ratio' },
-                { element: enhancementSelect, prefix: 'enhance' }
-            ];
-            
-            selects.forEach(select => {
-                Array.from(select.element.options).forEach(option => {
-                    const key = option.getAttribute('data-i18n');
-                    if (key) {
-                        option.textContent = translations[currentLang][key];
-                    }
+            // Color palette options
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
                 });
             });
+
+            // Share modal
+            closeShareModal.addEventListener('click', () => {
+                shareModal.classList.remove('active');
+            });
+
+            // Share options
+            shareOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const platform = option.getAttribute('data-platform');
+                    shareToPlatform(platform);
+                });
+            });
+
+            // Copy share URL
+            copyShareUrl.addEventListener('click', copyToClipboard);
+
+            // Advanced settings toggle
+            advancedSettingsToggle.addEventListener('click', () => {
+                advancedSettingsContent.classList.toggle('active');
+                const icon = advancedSettingsToggle.querySelector('i');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+
+            // Click on history item to load prompt
+            historyList.addEventListener('click', (e) => {
+                const historyItem = e.target.closest('.history-item');
+                if (historyItem) {
+                    const prompt = historyItem.getAttribute('data-prompt');
+                    const negativePrompt = historyItem.getAttribute('data-negative-prompt') || '';
+                    promptInput.value = prompt;
+                    negativePromptInput.value = negativePrompt;
+                }
+            });
         }
 
-        // Generate image using Pollinations API
-        async function generateImage() {
-            const prompt = promptInput.value.trim();
-            
-            if (!prompt) {
-                showToast(translations[currentLang].errorEmptyPrompt, 'error');
+        // Toggle theme
+        function toggleTheme() {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        // Update theme icon
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector('i');
+            icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // Toggle language
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'id' : 'en';
+            currentLanguageSpan.textContent = currentLanguage.toUpperCase();
+            localStorage.setItem('language', currentLanguage);
+            updateTranslations(currentLanguage);
+        }
+
+        // Update translations
+        function updateTranslations(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = translations[lang][key];
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(element => {
+                const key = element.getAttribute('data-i18n-ph');
+                element.setAttribute('placeholder', translations[lang][key]);
+            });
+        }
+
+        // Load history from localStorage
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('promptHistory')) || [];
+            historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.textContent = currentLanguage === 'en' ? 'No history yet' : 'Belum ada riwayat';
+                emptyMessage.style.padding = '10px';
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.color = 'var(--secondary)';
+                historyList.appendChild(emptyMessage);
                 return;
             }
+
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.setAttribute('data-prompt', item.prompt);
+                if (item.negativePrompt) {
+                    historyItem.setAttribute('data-negative-prompt', item.negativePrompt);
+                }
+                
+                const promptText = document.createElement('span');
+                promptText.textContent = item.prompt.length > 50 
+                    ? item.prompt.substring(0, 50) + '...' 
+                    : item.prompt;
+                
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-arrow-right';
+                
+                historyItem.appendChild(promptText);
+                historyItem.appendChild(icon);
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Save to history
+        function saveToHistory(prompt, negativePrompt) {
+            let history = JSON.parse(localStorage.getItem('promptHistory')) || [];
             
-            // Show loading overlay
-            loadingOverlay.style.display = 'flex';
+            // Check if this prompt already exists in history
+            const exists = history.some(item => item.prompt === prompt && item.negativePrompt === negativePrompt);
+            if (exists) return;
             
-            try {
-                // Build the prompt with all selected options
-                let fullPrompt = prompt;
-                
-                // Add style if selected
-                const style = styleSelect.value;
-                if (style !== 'none') {
-                    fullPrompt += `, ${translations['en'][`style${style.charAt(0).toUpperCase() + style.slice(1).replace('-', '')}`]}`;
-                }
-                
-                // Add enhancement if selected
-                const enhancement = enhancementSelect.value;
-                if (enhancement !== 'none') {
-                    fullPrompt += `, ${translations['en'][`enhance${enhancement.charAt(0).toUpperCase() + enhancement.slice(1).replace('-', '')}`]}`;
-                }
-                
-                // Add extra features if selected
-                const extraFeature = document.querySelector('input[name="extraFeatures"]:checked').value;
-                if (extraFeature !== 'none') {
-                    fullPrompt += `, ${translations['en'][`extra${extraFeature.charAt(0).toUpperCase() + extraFeature.slice(1).replace('-', '')}`]}`;
-                }
-                
-                // Add color palette if not default
-                const colorPalette = document.querySelector('input[name="colorPalette"]:checked').value;
-                if (colorPalette !== 'default') {
-                    fullPrompt += `, ${translations['en'][`color${colorPalette.charAt(0).toUpperCase() + colorPalette.slice(1)}`]}`;
-                }
-                
-                // Add composition if not default
-                const composition = document.querySelector('input[name="composition"]:checked').value;
-                if (composition !== 'default') {
-                    fullPrompt += `, ${translations['en'][`comp${composition.charAt(0).toUpperCase() + composition.slice(1).replace('-', '')}`]}`;
-                }
-                
-                // Add ultra enhance if selected
-                if (ultraEnhanceCheckbox.checked) {
-                    fullPrompt += `, ultra detailed, 8k, high resolution`;
-                }
-                
-                // Add NSFW tag if selected
-                if (nsfwCheckbox.checked) {
-                    fullPrompt += `, NSFW`;
-                }
-                
-                // Get aspect ratio
-                const aspectRatio = aspectRatioSelect.value;
-                let width, height;
-                
-                switch (aspectRatio) {
-                    case '1:1':
-                        width = 1024;
-                        height = 1024;
-                        break;
-                    case '4:3':
-                        width = 1024;
-                        height = 768;
-                        break;
-                    case '16:9':
-                        width = 1024;
-                        height = 576;
-                        break;
-                    case '9:16':
-                        width = 576;
-                        height = 1024;
-                        break;
-                    case '3:2':
-                        width = 1024;
-                        height = 683;
-                        break;
-                    case '2:3':
-                        width = 683;
-                        height = 1024;
-                        break;
-                    default:
-                        width = 1024;
-                        height = 1024;
-                }
-                
-                // Encode the prompt for URL
-                const encodedPrompt = encodeURIComponent(fullPrompt);
-                
-                // Build the API URL
-                let apiUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
-                
-                // Add parameters
-                apiUrl += `?width=${width}&height=${height}&nologo=true`;
-                
-                // Add model if not default
-                const model = modelSelect.value;
-                if (model !== 'default') {
-                    apiUrl += `&model=${model}`;
-                }
-                
-                // Add negative prompt if provided
-                const negativePrompt = negativePromptInput.value.trim();
-                if (negativePrompt) {
-                    apiUrl += `&negative_prompt=${encodeURIComponent(negativePrompt)}`;
-                }
-                
-                // Call the API
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) {
-                    throw new Error('API request failed');
-                }
-                
-                // Get the image blob
-                const blob = await response.blob();
-                const imageUrl = URL.createObjectURL(blob);
-                
-                // Add to gallery
-                addToGallery(imageUrl, prompt);
-                
-                // Add to history
-                addToHistory(prompt);
-                
-                // Show success message
-                showToast(translations[currentLang].successGenerate, 'success');
-                
-            } catch (error) {
-                console.error('Error generating image:', error);
-                showToast(translations[currentLang].errorGenerate, 'error');
-            } finally {
-                // Hide loading overlay
-                loadingOverlay.style.display = 'none';
+            // Add to history (limit to 20 items)
+            history.unshift({ prompt, negativePrompt });
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            localStorage.setItem('promptHistory', JSON.stringify(history));
+            loadHistory();
+        }
+
+        // Clear history
+        function clearHistory() {
+            const confirmMessage = currentLanguage === 'en' 
+                ? 'Are you sure you want to clear your prompt history?' 
+                : 'Apakah Anda yakin ingin menghapus riwayat prompt?';
+            
+            if (confirm(confirmMessage)) {
+                localStorage.removeItem('promptHistory');
+                loadHistory();
             }
         }
 
-        // Add generated image to gallery
-        function addToGallery(imageUrl, prompt) {
-            // Remove empty state if it exists
-            const emptyState = gallery.querySelector('.empty-state');
-            if (emptyState) {
-                gallery.removeChild(emptyState);
+        // Generate image
+        async function generateImage() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showToast(currentLanguage === 'en' ? 'Please enter a prompt to generate an image.' : 'Masukkan prompt untuk menghasilkan gambar.', 'error');
+                return;
+            }
+
+            const negativePrompt = negativePromptInput.value.trim();
+            const aiModel = aiModelSelect.value;
+            const style = styleSelect.value;
+            const aspectRatio = aspectRatioSelect.value;
+            const lightEnhancement = lightEnhancementSelect.value;
+            const additionalFeatures = additionalFeaturesSelect.value;
+            const upscaling = upscalingSelect.value;
+            const nsfw = nsfwCheckbox.checked;
+            const colorPalette = document.querySelector('.color-option.selected').getAttribute('data-value');
+            const composition = compositionSelect.value;
+
+            // Save to history
+            saveToHistory(prompt, negativePrompt);
+
+            // Show loading overlay
+            loadingOverlay.classList.add('active');
+            const loadingText = loadingOverlay.querySelector('.loading-text');
+            loadingText.textContent = currentLanguage === 'en' ? 'DERY AI Loading...' : 'DERY AI Memuat...';
+
+            // Construct the full prompt with all options
+            let fullPrompt = prompt;
+            
+            if (negativePrompt) {
+                fullPrompt += `, negative prompt: ${negativePrompt}`;
             }
             
-            // Create gallery item
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item';
+            if (aiModel !== 'default') {
+                fullPrompt += `, ${aiModel} model`;
+            }
             
-            // Create image element
+            if (style !== 'default') {
+                fullPrompt += `, ${style} style`;
+            }
+            
+            if (lightEnhancement !== 'none') {
+                fullPrompt += `, ${lightEnhancement}`;
+            }
+            
+            if (additionalFeatures !== 'none') {
+                fullPrompt += `, ${additionalFeatures}`;
+            }
+            
+            if (colorPalette !== 'default') {
+                fullPrompt += `, ${colorPalette} color palette`;
+            }
+            
+            if (composition !== 'default') {
+                fullPrompt += `, ${composition}`;
+            }
+            
+            if (nsfw) {
+                fullPrompt += ', nsfw allowed';
+            }
+
+            // Get dimensions from aspect ratio
+            const dimensions = getDimensionsFromAspectRatio(aspectRatio);
+            
+            try {
+                // Construct the API URL
+                let apiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}`;
+                
+                // Add dimensions if not default (1:1)
+                if (aspectRatio !== '1:1') {
+                    apiUrl += `?width=${dimensions.width}&height=${dimensions.height}`;
+                }
+                
+                // Add no logo parameter
+                apiUrl += aspectRatio === '1:1' ? '?nologo=true' : '&nologo=true';
+                
+                // Create a timestamp to force image reload
+                apiUrl += `&timestamp=${Date.now()}`;
+                
+                // Create image element
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = () => {
+                    // Hide loading overlay
+                    loadingOverlay.classList.remove('active');
+                    
+                    // Create image card
+                    createImageCard(img.src, prompt, dimensions);
+                    
+                    // Show success toast
+                    showToast(currentLanguage === 'en' ? 'Image generated successfully!' : 'Gambar berhasil dihasilkan!', 'success');
+                };
+                
+                img.onerror = () => {
+                    loadingOverlay.classList.remove('active');
+                    showToast(currentLanguage === 'en' ? 'Failed to generate image. Please try again.' : 'Gagal menghasilkan gambar. Silakan coba lagi.', 'error');
+                };
+                
+                img.src = apiUrl;
+            } catch (error) {
+                console.error('Error generating image:', error);
+                loadingOverlay.classList.remove('active');
+                showToast(currentLanguage === 'en' ? 'Failed to generate image. Please try again.' : 'Gagal menghasilkan gambar. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // Get dimensions from aspect ratio
+        function getDimensionsFromAspectRatio(aspectRatio) {
+            switch (aspectRatio) {
+                case '1:1': return { width: 3000, height: 3000 };
+                case '2:3': return { width: 2000, height: 3000 };
+                case '3:4': return { width: 3000, height: 4000 };
+                case '9:16': return { width: 2250, height: 4000 };
+                case '3:2': return { width: 3000, height: 2000 };
+                case '4:3': return { width: 4000, height: 3000 };
+                case '16:9': return { width: 4000, height: 2250 };
+                case '21:9': return { width: 5120, height: 2160 };
+                default: return { width: 3000, height: 3000 };
+            }
+        }
+
+        // Create image card
+        function createImageCard(imageUrl, prompt, dimensions) {
+            const imageCard = document.createElement('div');
+            imageCard.className = 'image-card';
+            
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container';
+            
             const img = document.createElement('img');
-            img.className = 'gallery-img';
+            img.className = 'generated-image';
             img.src = imageUrl;
             img.alt = prompt;
             
-            // Create overlay with prompt and actions
-            const overlay = document.createElement('div');
-            overlay.className = 'gallery-overlay';
-            
-            const promptText = document.createElement('div');
-            promptText.className = 'gallery-prompt';
-            promptText.textContent = prompt;
-            
-            const actions = document.createElement('div');
-            actions.className = 'gallery-actions';
+            const imageActions = document.createElement('div');
+            imageActions.className = 'image-actions';
             
             const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'gallery-btn';
-            downloadBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-            `;
+            downloadBtn.className = 'action-btn';
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+            downloadBtn.title = currentLanguage === 'en' ? 'Download' : 'Unduh';
             downloadBtn.addEventListener('click', () => downloadImage(imageUrl, prompt));
             
             const shareBtn = document.createElement('button');
-            shareBtn.className = 'gallery-btn';
-            shareBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="18" cy="5" r="3"></circle>
-                    <circle cx="6" cy="12" r="3"></circle>
-                    <circle cx="18" cy="19" r="3"></circle>
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                </svg>
-            `;
+            shareBtn.className = 'action-btn';
+            shareBtn.innerHTML = '<i class="fas fa-share-alt"></i>';
+            shareBtn.title = currentLanguage === 'en' ? 'Share' : 'Bagikan';
             shareBtn.addEventListener('click', () => openShareModal(imageUrl, prompt));
             
-            actions.appendChild(downloadBtn);
-            actions.appendChild(shareBtn);
+            imageActions.appendChild(downloadBtn);
+            imageActions.appendChild(shareBtn);
             
-            overlay.appendChild(promptText);
-            overlay.appendChild(actions);
+            imageContainer.appendChild(img);
+            imageContainer.appendChild(imageActions);
             
-            galleryItem.appendChild(img);
-            galleryItem.appendChild(overlay);
+            const imageInfo = document.createElement('div');
+            imageInfo.className = 'image-info';
             
-            // Add to the beginning of the gallery
-            gallery.insertBefore(galleryItem, gallery.firstChild);
+            const title = document.createElement('h3');
+            title.textContent = prompt.length > 30 ? prompt.substring(0, 30) + '...' : prompt;
+            
+            const details = document.createElement('p');
+            details.innerHTML = `<i class="fas fa-ruler-combined"></i> ${dimensions.width}×${dimensions.height} px`;
+            
+            imageInfo.appendChild(title);
+            imageInfo.appendChild(details);
+            
+            imageCard.appendChild(imageContainer);
+            imageCard.appendChild(imageInfo);
+            
+            // Prepend to gallery (show newest first)
+            gallery.insertBefore(imageCard, gallery.firstChild);
         }
 
         // Download image
@@ -1800,23 +1609,16 @@
 
         // Open share modal
         function openShareModal(imageUrl, prompt) {
-            shareUrl.value = imageUrl;
-            shareModal.classList.add('show');
+            shareUrlInput.value = imageUrl;
+            shareModal.classList.add('active');
         }
 
-        // Copy share URL to clipboard
-        function copyShareUrl() {
-            shareUrl.select();
-            document.execCommand('copy');
-            showToast(translations[currentLang].copiedToClipboard, 'success');
-        }
-
-        // Share on social media
-        function shareOnSocial(platform) {
-            const url = shareUrl.value;
-            const text = `Check out this AI-generated image I created with DERY AI: ${promptInput.value}`;
+        // Share to platform
+        function shareToPlatform(platform) {
+            const url = shareUrlInput.value;
+            const text = `Check out this AI-generated image: ${promptInput.value.substring(0, 100)}...`;
             
-            let shareUrl;
+            let shareUrl = '';
             
             switch (platform) {
                 case 'facebook':
@@ -1826,78 +1628,45 @@
                     shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
                     break;
                 case 'whatsapp':
-                    shareUrl = `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`;
+                    shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
                     break;
+                case 'instagram':
+                    // Instagram doesn't support direct sharing, so just copy the URL
+                    copyToClipboard();
+                    return;
                 case 'tiktok':
-                    // TikTok doesn't have a direct share API, so just copy the URL
-                    copyShareUrl();
+                    // TikTok doesn't support direct sharing, so just copy the URL
+                    copyToClipboard();
                     return;
-                case 'link':
-                    copyShareUrl();
-                    return;
+                case 'reddit':
+                    shareUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+                    break;
+                case 'pinterest':
+                    shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${encodeURIComponent(text)}`;
+                    break;
+                case 'telegram':
+                    shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+                    break;
                 default:
-                    return;
+                    break;
             }
             
-            window.open(shareUrl, '_blank', 'width=600,height=400');
-        }
-
-        // Add prompt to history
-        function addToHistory(prompt) {
-            // Get current history
-            let history = JSON.parse(localStorage.getItem('deryAIHistory') || '[]');
-            
-            // Add new prompt to the beginning
-            history.unshift({
-                prompt,
-                timestamp: Date.now()
-            });
-            
-            // Keep only the last 20 items
-            if (history.length > 20) {
-                history = history.slice(0, 20);
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('deryAIHistory', JSON.stringify(history));
-            
-            // Update history display
-            loadHistory();
-        }
-
-        // Load history from localStorage
-        function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('deryAIHistory') || '[]');
-            
-            // Clear current history display
-            historyList.innerHTML = '';
-            
-            // Add each history item
-            history.forEach((item, index) => {
-                const historyItem = document.createElement('div');
-                historyItem.className = 'history-item';
-                historyItem.textContent = item.prompt;
-                historyItem.addEventListener('click', () => {
-                    promptInput.value = item.prompt;
-                    promptInput.focus();
-                });
-                
-                historyList.appendChild(historyItem);
-            });
-        }
-
-        // Clear history
-        function clearHistory() {
-            if (confirm(translations[currentLang].confirmClearHistory)) {
-                localStorage.removeItem('deryAIHistory');
-                historyList.innerHTML = '';
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'noopener,noreferrer');
             }
         }
 
-        // Show toast notification
+        // Copy to clipboard
+        function copyToClipboard() {
+            shareUrlInput.select();
+            document.execCommand('copy');
+            showToast(currentLanguage === 'en' ? 'Copied to clipboard!' : 'Disalin ke clipboard!', 'success');
+        }
+
+        // Show toast message
         function showToast(message, type) {
             toast.textContent = message;
-            toast.className = `toast toast-${type}`;
+            toast.className = `toast ${type}`;
             toast.classList.add('show');
             
             setTimeout(() => {
@@ -1906,7 +1675,7 @@
         }
 
         // Initialize the app
-        document.addEventListener('DOMContentLoaded', init);
+        init();
     </script>
 </body>
 </html>
