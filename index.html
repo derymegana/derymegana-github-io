@@ -338,6 +338,16 @@
             background: rgba(110, 0, 255, 0.1);
         }
 
+        .btn-tertiary {
+            background: rgba(110, 0, 255, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-tertiary:hover {
+            background: rgba(0, 247, 255, 0.1);
+        }
+
         .btn-group {
             display: flex;
             gap: 10px;
@@ -757,6 +767,11 @@
                         <span class="en">Random Prompt</span>
                         <span class="id" style="display: none;">Perintah Acak</span>
                     </button>
+                    <button class="btn btn-tertiary" id="enhancePromptBtn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span class="en">Enhance Prompt</span>
+                        <span class="id" style="display: none;">Tingkatkan Perintah</span>
+                    </button>
                 </div>
             </div>
 
@@ -979,6 +994,7 @@
             const languageToggle = document.getElementById('languageToggle');
             const generateBtn = document.getElementById('generateBtn');
             const randomPromptBtn = document.getElementById('randomPromptBtn');
+            const enhancePromptBtn = document.getElementById('enhancePromptBtn');
             const promptInput = document.getElementById('promptInput');
             const negativePrompt = document.getElementById('negativePrompt');
             const modelSelect = document.getElementById('modelSelect');
@@ -1113,6 +1129,68 @@
                 
                 const randomIndex = Math.floor(Math.random() * randomPrompts.length);
                 promptInput.value = randomPrompts[randomIndex];
+            });
+            
+            // Enhance Prompt Button
+            enhancePromptBtn.addEventListener('click', function() {
+                const originalPrompt = promptInput.value.trim();
+                
+                if (!originalPrompt) {
+                    showNotification(
+                        currentLanguage === 'en' ? 'Please enter a prompt first' : 'Masukkan perintah terlebih dahulu', 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // Start with the original prompt
+                let enhancedPrompt = originalPrompt;
+                
+                // Remove any existing quality descriptors to avoid duplication
+                enhancedPrompt = enhancedPrompt.replace(/(ultra[- ]?detailed|high resolution|8K|4K|HD|high quality|highly detailed|intricate details|sharp focus|professional photography|cinematic lighting|photorealistic|hyper[- ]?realistic|masterpiece|artstation|trending on artstation|unreal engine|v-ray|octane render)/gi, '');
+                
+                // Add style if not default
+                if (styleSelect.value !== 'default') {
+                    enhancedPrompt += `, ${styleSelect.value}`;
+                }
+                
+                // Add lighting if not none
+                if (lightingSelect.value !== 'none') {
+                    enhancedPrompt += `, ${lightingSelect.value}`;
+                }
+                
+                // Add quality
+                enhancedPrompt += `, ${qualitySelect.value}`;
+                
+                // Add enhanced detail if checked
+                if (enhanceDetailCheckbox.checked) {
+                    enhancedPrompt += ', ultra high resolution, super detailed, intricate details';
+                }
+                
+                // Add color palette if not default
+                if (colorPaletteSelect.value !== 'default') {
+                    enhancedPrompt += `, ${colorPaletteSelect.value} color palette`;
+                }
+                
+                // Add composition if not default
+                if (compositionSelect.value !== 'default') {
+                    enhancedPrompt += `, ${compositionSelect.value}`;
+                }
+                
+                // Add standard quality descriptors
+                enhancedPrompt += ', ultra-detailed, high resolution, sharp focus, professional photography';
+                
+                // Clean up any double commas or spaces
+                enhancedPrompt = enhancedPrompt.replace(/\s*,\s*,/g, ', ');
+                enhancedPrompt = enhancedPrompt.replace(/\s+/g, ' ').trim();
+                
+                // Update the prompt input
+                promptInput.value = enhancedPrompt;
+                
+                showNotification(
+                    currentLanguage === 'en' ? 'Prompt enhanced successfully!' : 'Perintah berhasil ditingkatkan!', 
+                    'success'
+                );
             });
             
             // Generate Button
