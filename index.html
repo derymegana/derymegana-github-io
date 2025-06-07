@@ -24,6 +24,7 @@
         <div class="tabs">
             <button class="tab-btn active" data-tab="image-tab"><i class="fas fa-image"></i> Image Generation</button>
             <button class="tab-btn" data-tab="audio-tab"><i class="fas fa-music"></i> Text to Speech</button>
+            <button class="tab-btn" data-tab="chat-tab"><i class="fas fa-comments"></i> AI Chat</button>
         </div>
 
         <div class="tab-content active" id="image-tab">
@@ -223,6 +224,81 @@
             </div>
         </div>
         
+        <div class="tab-content" id="chat-tab">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-title">DERY AI Chat</div>
+                    <div>
+                        <span class="status-indicator status-online"></span>
+                        <span>Online</span>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        Hello! I'm DERY AI, your powerful chatbot assistant. How can I help you today?
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="user-input" placeholder="Type your message here..." autocomplete="off">
+                    <button class="send-button" id="send-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-settings-container">
+                <div class="settings-title">Bot Settings</div>
+                
+                <div class="setting-group">
+                    <label for="bot-name" class="setting-label">Bot Name</label>
+                    <input type="text" id="bot-name" class="setting-input" value="DERY AI">
+                </div>
+                
+                <div class="setting-group">
+                    <label for="bot-personality" class="setting-label">Personality</label>
+                    <select id="bot-personality" class="select-input">
+                        <option value="friendly">Friendly</option>
+                        <option value="professional">Professional</option>
+                        <option value="humorous">Humorous</option>
+                        <option value="sarcastic">Sarcastic</option>
+                        <option value="technical">Technical</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="api-endpoint" class="setting-label">API Endpoint</label>
+                    <input type="text" id="api-endpoint" class="setting-input" value="https://text.pollinations.ai/prompt/">
+                    <button class="copy-button" id="copy-api">Copy</button>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="temperature" class="setting-label">Creativity (Temperature)
+                        <span id="temperature-value" class="slider-value">0.7</span>
+                    </label>
+                    <input type="range" id="temperature" class="slider-input" min="0" max="1" step="0.1" value="0.7">
+                </div>
+                
+                <div class="setting-group">
+                    <label for="max-tokens" class="setting-label">Response Length
+                        <span id="max-tokens-value" class="slider-value">150</span>
+                    </label>
+                    <input type="range" id="max-tokens" class="slider-input" min="50" max="500" step="10" value="150">
+                </div>
+                
+                <div class="setting-group">
+                    <label for="system-prompt" class="setting-label">System Prompt</label>
+                    <textarea id="system-prompt" class="setting-input" rows="4">You are DERY AI, a helpful AI assistant. Provide detailed, accurate and helpful responses to the user's questions. Be polite and friendly in your tone.</textarea>
+                </div>
+                
+                <button class="save-button" id="save-settings">Save Settings</button>
+            </div>
+        </div>
+        
         <footer>
             <p>Copyright &copy; 2025 DERY AI GENERATOR</p>
             <p>Powered by Pollinations API | Developed by Dery Lau</p>
@@ -232,5 +308,6 @@
     
     <script src="script.js"></script>
     <script src="tts.js"></script>
+    <script src="chat.js"></script>
 </body>
 </html>
