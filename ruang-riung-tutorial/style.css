@@ -1,0 +1,208 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+/* Header */
+header {
+    background: #333;
+    color: #fff;
+    padding: 1rem 0;
+    border-bottom: #77aaff 3px solid;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+/* Navigation */
+.main-nav ul {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.main-nav ul li {
+    display: inline;
+    margin-left: 20px;
+}
+
+.main-nav a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.main-nav a:hover {
+    color: #77aaff;
+}
+
+/* Hamburger Menu (for mobile) */
+.hamburger-menu {
+    display: none; /* Hidden by default on larger screens */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    position: relative;
+    z-index: 1001;
+}
+
+.hamburger-menu .bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #fff;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+}
+
+/* Active state for hamburger menu */
+.hamburger-menu.active .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-menu.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Main Content Sections */
+.section-content {
+    background: #fff;
+    padding: 30px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.section-content h2 {
+    color: #333;
+    border-bottom: 2px solid #77aaff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.section-content h3 {
+    color: #555;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.section-content h4 {
+    color: #666;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.section-content ul, .section-content ol {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.section-content li {
+    margin-bottom: 8px;
+}
+
+.section-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.section-content th, .section-content td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.section-content th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.section-content blockquote {
+    background-color: #e9f7ff;
+    border-left: 5px solid #77aaff;
+    padding: 15px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #444;
+}
+
+.section-content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.section-content a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header .container {
+        flex-direction: row; /* Keep logo and hamburger on one line */
+        justify-content: space-between;
+    }
+
+    .main-nav {
+        position: fixed;
+        top: 0;
+        left: -100%; /* Hidden by default */
+        width: 70%;
+        height: 100%;
+        background: #333;
+        padding-top: 60px; /* Space for header */
+        transition: left 0.3s ease;
+        z-index: 999;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+    }
+
+    .main-nav.active {
+        left: 0; /* Show menu */
+    }
+
+    .main-nav ul {
+        flex-direction: column;
+        text-align: left;
+        padding: 20px;
+    }
+
+    .main-nav ul li {
+        margin: 15px 0;
+        display: block;
+    }
+
+    .hamburger-menu {
+        display: block; /* Show hamburger menu */
+    }
+}
+
