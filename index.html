@@ -35,6 +35,7 @@
                         <button id="enhancePrompt"><i class="fas fa-magic"></i> Enhance</button>
                         <button id="ultraEnhanceBtn"><i class="fas fa-stars"></i> Ultra Enhance</button>
                         <button id="randomPrompt"><i class="fas fa-random"></i> Random</button>
+                        <button id="clearPromptsBtn" style="background: linear-gradient(45deg, #e74c3c, #c0392b);"><i class="fas fa-eraser"></i> Clear Prompts</button>
                     </div>
                     <textarea id="negativePrompt" placeholder="Negative prompt (what you don't want to see)..."></textarea>
                 </div>
@@ -45,6 +46,9 @@
                             <label for="model">Model AI:</label>
                             <select id="model">
                                 <option value="default">Default (Pollinations)</option>
+                                <option value="nanobanana">Nanobanana (Fast & Stylized)</option>
+                                <option value="seedream">Seedream (High Quality)</option>
+                                <option value="imagen4">Imagen 4 (Google)</option>
                                 <option value="gptimage">GPT-Image</option>
                                 <option value="flux">Flux</option>
                                 <option value="turbo">Turbo</option>
@@ -57,7 +61,7 @@
                         </div>
                         
                         <div class="setting-group">
-                            <label for="style">Style:</label>
+                            <label for="style">Base Style:</label>
                             <select id="style">
                                 <option value="">Default</option>
                                 <option value="holographic">Holographic</option>
@@ -102,14 +106,15 @@
                             </div>
                         </div>
                         
-                        <div class="setting-group">
-                            <label for="width">Width:</label>
-                            <input type="number" id="width" value="1024" min="1024" max="3840">
-                        </div>
-                        
-                        <div class="setting-group">
-                            <label for="height">Height:</label>
-                            <input type="number" id="height" value="1024" min="1024" max="3840">
+                        <div class="setting-group settings-row" style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label for="width">Width:</label>
+                                <input type="number" id="width" value="1024" min="512" max="3840">
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="height">Height:</label>
+                                <input type="number" id="height" value="1024" min="512" max="3840">
+                            </div>
                         </div>
                         
                         <div class="setting-group">
@@ -120,6 +125,23 @@
                     </div>
                     
                     <div class="settings-column">
+                        <div class="setting-group">
+                            <label for="advancedStyle">Advanced Style:</label>
+                            <select id="advancedStyle">
+                                <option value="">None</option>
+                                <option value="hyperrealism">Hyperrealism</option>
+                                <option value="cinematic">Cinematic</option>
+                                <option value="oilpainting">Oil Painting</option>
+                                <option value="watercolor">Watercolor</option>
+                                <option value="fractal">Fractal</option>
+                                <option value="cyberpunk">Cyberpunk</option>
+                                <option value="steampunk">Steampunk</option>
+                                <option value="fantasy">Fantasy</option>
+                                <option value="surrealism">Surrealism</option>
+                                <option value="macabre">Macabre</option>
+                            </select>
+                        </div>
+
                         <div class="setting-group">
                             <label for="colorPalette">Color Palette:</label>
                             <select id="colorPalette">
@@ -155,8 +177,9 @@
                 </div>
                 
                 <div class="generate-controls">
-                    <button id="generateBtn"><i class="fas fa-cogs"></i> GENERATE</button>
+                    <button id="generateBtn"><i class="fas fa-cogs"></i> GENERATE IMAGE</button>
                     <button id="advancedBtn"><i class="fas fa-sliders-h"></i> Advanced</button>
+                    <button id="img2imgBtn" style="background: linear-gradient(45deg, #3498db, #2ecc71);"><i class="fas fa-image"></i> Use as Base Image</button>
                 </div>
             </div>
             
@@ -169,6 +192,7 @@
                 </div>
                 
                 <div class="image-container" id="imageContainer">
+                    <p id="imageCaption" style="font-style: italic; color: var(--text-color); margin-bottom: 10px; display: none;">Prompt: </p>
                     <img id="generatedImage" alt="Generated image will appear here">
                     <div class="image-controls" id="imageControls" style="display: none;">
                         <button id="downloadBtn"><i class="fas fa-download"></i> Download</button>
@@ -189,115 +213,8 @@
             </div>
         </div>
 
-        <div class="tab-content" id="audio-tab">
-            <div class="audio-controls">
-                <div class="input-group">
-                    <label for="tts-prompt">Enter your text:</label>
-                    <textarea id="tts-prompt" placeholder="Type what you want to convert to speech..."></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label for="tts-voice">Select voice style:</label>
-                    <select id="tts-voice">
-                        <option value="alloy">Alloy - Clear and versatile</option>
-                        <option value="echo">Echo - Bright and energetic</option>
-                        <option value="fable">Fable - Storytelling tone</option>
-                        <option value="onyx">Onyx - Deep and rich</option>
-                        <option value="nova">Nova - Warm and expressive</option>
-                        <option value="shimmer">Shimmer - Soft and calming</option>
-                    </select>
-                    <div class="voice-description" id="tts-voice-desc">Clear and versatile voice suitable for most content.</div>
-                </div>
-                
-                <button id="tts-generate-btn"><i class="fas fa-music"></i> Generate Audio</button>
-                
-                <div class="loading" id="tts-loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Generating audio, please wait...</p>
-                </div>
-                
-                <div class="audio-result" id="tts-audio-container" style="display: none;">
-                    <h3><i class="fas fa-volume-up"></i> Your Generated Audio:</h3>
-                    <audio id="tts-audio-player" controls></audio>
-                    <button class="download-btn" id="tts-download-btn"><i class="fas fa-download"></i> Download Audio</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="chat-tab">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <div class="chat-title">DERY AI Chat</div>
-                    <div>
-                        <span class="status-indicator status-online"></span>
-                        <span>Online</span>
-                    </div>
-                </div>
-                
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message bot-message">
-                        Hello! I'm DERY AI, your powerful chatbot assistant. How can I help you today?
-                    </div>
-                </div>
-                
-                <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="user-input" placeholder="Type your message here..." autocomplete="off">
-                    <button class="send-button" id="send-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="chat-settings-container">
-                <div class="settings-title">Bot Settings</div>
-                
-                <div class="setting-group">
-                    <label for="bot-name" class="setting-label">Bot Name</label>
-                    <input type="text" id="bot-name" class="setting-input" value="DERY AI">
-                </div>
-                
-                <div class="setting-group">
-                    <label for="bot-personality" class="setting-label">Personality</label>
-                    <select id="bot-personality" class="select-input">
-                        <option value="friendly">Friendly</option>
-                        <option value="professional">Professional</option>
-                        <option value="humorous">Humorous</option>
-                        <option value="sarcastic">Sarcastic</option>
-                        <option value="technical">Technical</option>
-                    </select>
-                </div>
-                
-                <div class="setting-group">
-                    <label for="api-endpoint" class="setting-label">API Endpoint</label>
-                    <input type="text" id="api-endpoint" class="setting-input" value="https://text.pollinations.ai/prompt/">
-                    <button class="copy-button" id="copy-api">Copy</button>
-                </div>
-                
-                <div class="setting-group">
-                    <label for="temperature" class="setting-label">Creativity (Temperature)
-                        <span id="temperature-value" class="slider-value">0.7</span>
-                    </label>
-                    <input type="range" id="temperature" class="slider-input" min="0" max="1" step="0.1" value="0.7">
-                </div>
-                
-                <div class="setting-group">
-                    <label for="max-tokens" class="setting-label">Response Length
-                        <span id="max-tokens-value" class="slider-value">150</span>
-                    </label>
-                    <input type="range" id="max-tokens" class="slider-input" min="50" max="500" step="10" value="150">
-                </div>
-                
-                <div class="setting-group">
-                    <label for="system-prompt" class="setting-label">System Prompt</label>
-                    <textarea id="system-prompt" class="setting-input" rows="4">You are DERY AI, a helpful AI assistant. Provide detailed, accurate and helpful responses to the user's questions. Be polite and friendly in your tone.</textarea>
-                </div>
-                
-                <button class="save-button" id="save-settings">Save Settings</button>
-            </div>
-        </div>
+        <div class="tab-content" id="audio-tab">...</div>
+        <div class="tab-content" id="chat-tab">...</div>
         
         <footer>
             <p>Copyright &copy; 2025 DERY AI GENERATOR</p>
