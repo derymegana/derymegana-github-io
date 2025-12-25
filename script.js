@@ -1,6 +1,5 @@
 // Konfigurasi & State
 const BASE_URL = "https://image.pollinations.ai/prompt/";
-let currentBlobUrl = null;
 
 // Saat halaman dimuat, load history
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Fungsi Utama Generate
-async function generateImage() {
+function generateImage() {
     const promptInput = document.getElementById('promptInput').value.trim();
     const model = document.getElementById('modelSelect').value;
     const style = document.getElementById('styleSelect').value;
@@ -28,149 +27,126 @@ async function generateImage() {
         return;
     }
 
-    // Reset UI
-    loader.style.display = "block";
+    // 1. Reset UI ke mode Loading
+    loader.style.display = "flex"; // Pastikan flex agar tengah
+    loadingText.innerText = "Meracik visual... (5-10 detik)";
     resultImg.style.display = "none";
     placeholder.style.display = "none";
     actionBar.style.display = "none";
     
-    // Tentukan Resolusi
+    // 2. Tentukan Dimensi
     let width, height;
     switch (aspectRatio) {
         case '16:9': width = 1280; height = 720; break;
-        case '9:16': width = 720; height = 1280; break; // Terbaik untuk HP
+        case '9:16': width = 720; height = 1280; break; 
         case '4:3': width = 1152; height = 864; break;
         case '21:9': width = 1536; height = 640; break;
-        default: width = 1024; height = 1024; // 1:1
+        default: width = 1024; height = 1024;
     }
 
-    // Generate Seed Random
+    // 3. Buat Seed Acak
     const seed = Math.floor(Math.random() * 999999);
 
-    // Prompt Engineering
+    // 4. Susun Prompt
     let finalPrompt = promptInput;
     if (style) finalPrompt = `${style} style, ${finalPrompt}`;
-    if (enhancePrompt) finalPrompt += ", detailed lighting, cinematic composition, trending on artstation";
-    if (qualityBoost) finalPrompt += ", ultra detailed, high resolution 8k, Masterpiece Maximalisme, HDR, sharp focus";
+    if (enhancePrompt) finalPrompt += ", cinematic lighting, 8k resolution, detailed texture";
+    if (qualityBoost) finalPrompt += ", masterpiece, ultra detailed, photorealistic, HDR, sharp focus";
 
-    // Update Text Loading
-    loadingText.innerText = "Sedang meracik pixel... (Tunggu sebentar)";
-
-    // URL Construction
+    // 5. Susun URL (Menggunakan encodeURIComponent agar simbol aman)
     const encodedPrompt = encodeURIComponent(finalPrompt);
-    const url = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=${model}&seed=${seed}&nologo=true&enhance=true&private=false&quality=hd`;
+    // Tambahkan parameter 'nologo=true' dan 'private=true'
+    const imageUrl = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=${model}&seed=${seed}&nologo=true&enhance=false`;
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Gagal mengambil gambar");
+    console.log("Loading URL:", imageUrl); // Untuk debugging
 
-        const blob = await response.blob();
-        currentBlobUrl = URL.createObjectURL(blob);
+    // 6. Trik Loading Gambar Stabil (Direct Source)
+    // Kita set src langsung, lalu tunggu event onload
+    resultImg.src = imageUrl;
 
-        // Tampilkan Hasil
-        resultImg.src = currentBlobUrl;
-        resultImg.onload = () => {
-            loader.style.display = "none";
-            resultImg.style.display = "block";
-            actionBar.style.display = "flex";
-            seedDisplay.innerText = `Seed: ${seed}`;
-            
-            // Simpan ke History otomatis
-            saveToHistory(currentBlobUrl, seed);
-        };
+    resultImg.onload = function() {
+        // Sukses
+        loader.style.display = "none";
+        resultImg.style.display = "block";
+        actionBar.style.display = "flex";
+        seedDisplay.innerText = `Seed: ${seed}`;
+        
+        // Simpan ke history (URL saja agar ringan)
+        saveToHistory(imageUrl, seed);
+    };
 
-    } catch (error) {
-        console.error(error);
+    resultImg.onerror = function() {
+        // Gagal
         loader.style.display = "none";
         placeholder.style.display = "block";
-        alert("Terjadi kesalahan koneksi atau server sibuk. Coba lagi.");
+        loadingText.innerText = "Gagal memuat. Server sibuk.";
+        alert("Gagal memuat gambar. Server sedang sibuk atau koneksi tidak stabil. Silakan tekan Generate lagi.");
+    };
+}
+
+// Fungsi Download (Membuka gambar di tab baru untuk disimpan)
+function downloadImage() {
+    const img = document.getElementById('resultImage');
+    if (img.src) {
+        // Karena masalah keamanan browser (CORS), cara paling aman di HP adalah membuka link
+        // lalu user menekan tahan gambar untuk save.
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.target = "_blank";
+        link.download = `dery-ai-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 
-// Fungsi Download
-function downloadImage() {
-    if (!currentBlobUrl) return;
-    
-    const a = document.createElement('a');
-    a.href = currentBlobUrl;
-    a.download = `dery-ai-gen-${Date.now()}.png`; // Format PNG
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-// === FITUR HISTORY ===
+// === FITUR HISTORY (Dioptimalkan) ===
 
 function saveToHistory(imageUrl, seed) {
-    // Ambil data lama
     let history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
     
-    // Convert blob URL ke Base64 agar bisa disimpan di LocalStorage (terbatas size)
-    // Catatan: Untuk produksi skala besar, Base64 di LS tidak disarankan, tapi untuk tool simple ini oke.
-    // Kita gunakan teknik canvas untuk convert gambar yang sudah load ke base64
-    const img = document.getElementById('resultImage');
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    
-    try {
-        const base64Data = canvas.toDataURL('image/png');
-        
-        // Simpan object baru di awal array
-        history.unshift({
-            image: base64Data,
-            seed: seed,
-            timestamp: new Date().getTime()
-        });
+    // Simpan URL saja (bukan base64) agar localStorage tidak penuh
+    history.unshift({
+        url: imageUrl,
+        seed: seed
+    });
 
-        // Batasi history maksimal 12 gambar agar browser tidak berat
-        if (history.length > 12) history.pop();
+    if (history.length > 10) history.pop(); // Batasi 10 item
 
-        localStorage.setItem('deryAiHistory', JSON.stringify(history));
-        loadHistory(); // Refresh tampilan
-
-    } catch (e) {
-        console.warn("Storage penuh, gagal simpan history", e);
-    }
+    localStorage.setItem('deryAiHistory', JSON.stringify(history));
+    loadHistory();
 }
 
 function loadHistory() {
     const historyGrid = document.getElementById('historyGrid');
     const history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
     
-    historyGrid.innerHTML = ""; // Bersihkan dulu
+    historyGrid.innerHTML = ""; 
 
     if (history.length === 0) {
-        historyGrid.innerHTML = "<p style='color:#666; grid-column: 1/-1; text-align:center;'>Belum ada riwayat.</p>";
+        historyGrid.innerHTML = "<p style='color:#666; width:100%; text-align:center;'>Belum ada riwayat.</p>";
         return;
     }
 
     history.forEach(item => {
         const div = document.createElement('div');
         div.className = 'history-item';
-        div.innerHTML = `<img src="${item.image}" alt="History ${item.seed}">`;
+        // Menggunakan img tag standard
+        div.innerHTML = `<img src="${item.url}" loading="lazy" alt="History">`;
         
-        // Klik history untuk menampilkan ulang di main preview
         div.onclick = () => {
             const resultImg = document.getElementById('resultImage');
             const actionBar = document.getElementById('actionBar');
             const placeholder = document.getElementById('placeholder');
-            
-            resultImg.src = item.image;
-            resultImg.style.display = "block";
+            const loader = document.getElementById('loader');
+
+            loader.style.display = "none";
             placeholder.style.display = "none";
+            resultImg.style.display = "block";
+            resultImg.src = item.url;
             actionBar.style.display = "flex";
-            
-            // Re-create blob url untuk download button agar jalan
-            fetch(item.image).then(res => res.blob()).then(blob => {
-                currentBlobUrl = URL.createObjectURL(blob);
-            });
-            
             document.getElementById('seedDisplay').innerText = `Seed: ${item.seed}`;
             
-            // Scroll ke atas (Mobile user experience)
             document.querySelector('.output-panel').scrollIntoView({ behavior: 'smooth' });
         };
         
@@ -179,7 +155,7 @@ function loadHistory() {
 }
 
 function clearHistory() {
-    if (confirm("Hapus semua riwayat gambar?")) {
+    if (confirm("Hapus semua riwayat?")) {
         localStorage.removeItem('deryAiHistory');
         loadHistory();
     }
