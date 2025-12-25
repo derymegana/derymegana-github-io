@@ -1,162 +1,137 @@
-// Konfigurasi & State
+// CONFIG
 const BASE_URL = "https://image.pollinations.ai/prompt/";
+let currentImageUrl = ""; // Menyimpan URL gambar saat ini
 
-// Saat halaman dimuat, load history
-document.addEventListener('DOMContentLoaded', () => {
-    loadHistory();
-});
+// Load history saat web dibuka
+window.onload = loadHistory;
 
-// Fungsi Utama Generate
-function generateImage() {
-    const promptInput = document.getElementById('promptInput').value.trim();
-    const model = document.getElementById('modelSelect').value;
-    const style = document.getElementById('styleSelect').value;
-    const aspectRatio = document.getElementById('aspectRatio').value;
-    const enhancePrompt = document.getElementById('enhancePrompt').checked;
-    const qualityBoost = document.getElementById('qualityBoost').checked;
+function startGenerate() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    if (!prompt) return alert("Isi deskripsi gambar dulu!");
 
+    // UI ELEMENTS
     const loader = document.getElementById('loader');
     const resultImg = document.getElementById('resultImage');
     const placeholder = document.getElementById('placeholder');
-    const actionBar = document.getElementById('actionBar');
-    const seedDisplay = document.getElementById('seedDisplay');
-    const loadingText = document.getElementById('loadingText');
-
-    if (!promptInput) {
-        alert("Mohon isi deskripsi gambar (Prompt) terlebih dahulu!");
-        return;
-    }
-
-    // 1. Reset UI ke mode Loading
-    loader.style.display = "flex"; // Pastikan flex agar tengah
-    loadingText.innerText = "Meracik visual... (5-10 detik)";
-    resultImg.style.display = "none";
-    placeholder.style.display = "none";
-    actionBar.style.display = "none";
+    const btns = document.getElementById('actionButtons');
     
-    // 2. Tentukan Dimensi
-    let width, height;
-    switch (aspectRatio) {
-        case '16:9': width = 1280; height = 720; break;
-        case '9:16': width = 720; height = 1280; break; 
-        case '4:3': width = 1152; height = 864; break;
-        case '21:9': width = 1536; height = 640; break;
-        default: width = 1024; height = 1024;
-    }
+    // INPUT VALUES
+    const model = document.getElementById('modelSelect').value;
+    const ratio = document.getElementById('aspectRatio').value;
+    const enhance = document.getElementById('enhancePrompt').checked;
+    const quality = document.getElementById('qualityBoost').checked;
+
+    // 1. Tentukan Ukuran (Resolusi Aman)
+    let w = 1024, h = 1024;
+    if (ratio === "16:9") { w = 1280; h = 720; }
+    else if (ratio === "9:16") { w = 720; h = 1280; }
+
+    // 2. Buat Prompt Final
+    let finalPrompt = prompt;
+    if (quality) finalPrompt += ", ultra detailed, 8k resolution, masterpiece, sharp focus";
+    if (enhance) finalPrompt += ", cinematic lighting, vivid colors";
 
     // 3. Buat Seed Acak
-    const seed = Math.floor(Math.random() * 999999);
+    const seed = Math.floor(Math.random() * 1000000);
 
-    // 4. Susun Prompt
-    let finalPrompt = promptInput;
-    if (style) finalPrompt = `${style} style, ${finalPrompt}`;
-    if (enhancePrompt) finalPrompt += ", cinematic lighting, 8k resolution, detailed texture";
-    if (qualityBoost) finalPrompt += ", masterpiece, ultra detailed, photorealistic, HDR, sharp focus";
-
-    // 5. Susun URL (Menggunakan encodeURIComponent agar simbol aman)
+    // 4. SUSUN URL (Encode wajib ada!)
+    // Kita tambah parameter 'nologo=true' dan 'private=true'
     const encodedPrompt = encodeURIComponent(finalPrompt);
-    // Tambahkan parameter 'nologo=true' dan 'private=true'
-    const imageUrl = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=${model}&seed=${seed}&nologo=true&enhance=false`;
+    const url = `${BASE_URL}${encodedPrompt}?width=${w}&height=${h}&model=${model}&seed=${seed}&nologo=true&enhance=false`;
 
-    console.log("Loading URL:", imageUrl); // Untuk debugging
+    currentImageUrl = url;
 
-    // 6. Trik Loading Gambar Stabil (Direct Source)
-    // Kita set src langsung, lalu tunggu event onload
-    resultImg.src = imageUrl;
+    // 5. PROSES LOADING GAMBAR
+    // Reset Tampilan
+    loader.style.display = "flex";
+    placeholder.style.display = "none";
+    resultImg.style.display = "none";
+    btns.style.display = "none";
 
-    resultImg.onload = function() {
-        // Sukses
+    // Teknik Pre-loading Image
+    const imgLoader = new Image();
+    imgLoader.src = url;
+
+    // Jika BERHASIL
+    imgLoader.onload = function() {
         loader.style.display = "none";
+        resultImg.src = url;
         resultImg.style.display = "block";
-        actionBar.style.display = "flex";
-        seedDisplay.innerText = `Seed: ${seed}`;
+        btns.style.display = "flex";
+        document.getElementById('seedInfo').innerText = `Seed: ${seed}`;
         
-        // Simpan ke history (URL saja agar ringan)
-        saveToHistory(imageUrl, seed);
+        // Simpan ke History
+        saveHistory(url);
     };
 
-    resultImg.onerror = function() {
-        // Gagal
+    // Jika GAGAL (Timeout / Error Server)
+    imgLoader.onerror = function() {
         loader.style.display = "none";
         placeholder.style.display = "block";
-        loadingText.innerText = "Gagal memuat. Server sibuk.";
-        alert("Gagal memuat gambar. Server sedang sibuk atau koneksi tidak stabil. Silakan tekan Generate lagi.");
+        alert("Gagal memuat gambar. Server sedang sibuk, coba tekan Generate lagi.");
     };
 }
 
-// Fungsi Download (Membuka gambar di tab baru untuk disimpan)
-function downloadImage() {
-    const img = document.getElementById('resultImage');
-    if (img.src) {
-        // Karena masalah keamanan browser (CORS), cara paling aman di HP adalah membuka link
-        // lalu user menekan tahan gambar untuk save.
-        const link = document.createElement('a');
-        link.href = img.src;
-        link.target = "_blank";
-        link.download = `dery-ai-${Date.now()}.png`;
+// FUNGSI DOWNLOAD (Smart Fallback)
+async function forceDownload() {
+    if (!currentImageUrl) return;
+
+    try {
+        // Coba fetch blob (cara ideal)
+        const response = await fetch(currentImageUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = `DERY-AI-${Date.now()}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+    } catch (error) {
+        // Jika fetch gagal (karena CORS di HP), buka tab baru
+        console.log("Download otomatis gagal, membuka tab baru...");
+        window.open(currentImageUrl, '_blank');
     }
 }
 
-// === FITUR HISTORY (Dioptimalkan) ===
-
-function saveToHistory(imageUrl, seed) {
-    let history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
-    
-    // Simpan URL saja (bukan base64) agar localStorage tidak penuh
-    history.unshift({
-        url: imageUrl,
-        seed: seed
-    });
-
-    if (history.length > 10) history.pop(); // Batasi 10 item
-
-    localStorage.setItem('deryAiHistory', JSON.stringify(history));
-    loadHistory();
+// MANAJEMEN HISTORY
+function saveHistory(url) {
+    let history = JSON.parse(localStorage.getItem('deryHistory')) || [];
+    // Cek duplikasi
+    if (!history.includes(url)) {
+        history.unshift(url);
+        if (history.length > 8) history.pop(); // Simpan max 8
+        localStorage.setItem('deryHistory', JSON.stringify(history));
+        loadHistory();
+    }
 }
 
 function loadHistory() {
-    const historyGrid = document.getElementById('historyGrid');
-    const history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
+    const grid = document.getElementById('historyGrid');
+    const history = JSON.parse(localStorage.getItem('deryHistory')) || [];
     
-    historyGrid.innerHTML = ""; 
-
-    if (history.length === 0) {
-        historyGrid.innerHTML = "<p style='color:#666; width:100%; text-align:center;'>Belum ada riwayat.</p>";
-        return;
-    }
-
-    history.forEach(item => {
+    grid.innerHTML = "";
+    history.forEach(url => {
         const div = document.createElement('div');
-        div.className = 'history-item';
-        // Menggunakan img tag standard
-        div.innerHTML = `<img src="${item.url}" loading="lazy" alt="History">`;
-        
+        div.className = 'hist-item';
+        div.innerHTML = `<img src="${url}" loading="lazy">`;
         div.onclick = () => {
-            const resultImg = document.getElementById('resultImage');
-            const actionBar = document.getElementById('actionBar');
-            const placeholder = document.getElementById('placeholder');
-            const loader = document.getElementById('loader');
-
-            loader.style.display = "none";
-            placeholder.style.display = "none";
-            resultImg.style.display = "block";
-            resultImg.src = item.url;
-            actionBar.style.display = "flex";
-            document.getElementById('seedDisplay').innerText = `Seed: ${item.seed}`;
-            
-            document.querySelector('.output-panel').scrollIntoView({ behavior: 'smooth' });
+            // Restore gambar
+            document.getElementById('resultImage').src = url;
+            document.getElementById('resultImage').style.display = "block";
+            document.getElementById('placeholder').style.display = "none";
+            document.getElementById('actionButtons').style.display = "flex";
+            currentImageUrl = url;
         };
-        
-        historyGrid.appendChild(div);
+        grid.appendChild(div);
     });
 }
 
 function clearHistory() {
-    if (confirm("Hapus semua riwayat?")) {
-        localStorage.removeItem('deryAiHistory');
+    if(confirm("Hapus semua riwayat?")) {
+        localStorage.removeItem('deryHistory');
         loadHistory();
     }
 }
