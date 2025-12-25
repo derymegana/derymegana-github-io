@@ -3,90 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DERY AI • FLUX STUDIO</title>
+    <title>DERY AI • ULTIMATE</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="main-container">
         <header>
-            <div class="logo">
-                <i class="fas fa-cube"></i> DERY AI <span>STUDIO</span>
+            <div class="brand">
+                <i class="fas fa-shapes"></i> DERY AI <span>PRO</span>
             </div>
-            <button onclick="clearInput()" class="btn-reset"><i class="fas fa-eraser"></i></button>
+            <div class="status-dot" id="connectionStatus" title="Status Sistem"></div>
         </header>
 
-        <div class="control-panel">
-            <textarea id="promptInput" placeholder="Tulis imajinasimu di sini... (Contoh: A cute futuristic cat, neon lights, 8k render)"></textarea>
-            
-            <div class="settings-grid">
-                <div class="setting-item">
-                    <label><i class="fas fa-robot"></i> Model AI</label>
-                    <select id="modelSelect">
-                        <option value="flux">Flux (Default Terbaik)</option>
-                        <option value="flux-realism">Flux Realism</option>
-                        <option value="flux-anime">Flux Anime</option>
-                        <option value="flux-3d">Flux 3D</option>
+        <section class="controls">
+            <div class="input-wrapper">
+                <textarea id="prompt" placeholder="Deskripsikan gambar di sini... (Contoh: A cyberpunk cat in neon city, 8k render)"></textarea>
+            </div>
+
+            <div class="settings">
+                <div class="select-group">
+                    <label>Ukuran</label>
+                    <select id="ratio">
+                        <option value="9:16">9:16 (Story)</option>
+                        <option value="16:9">16:9 (Landscape)</option>
+                        <option value="1:1">1:1 (Kotak)</option>
+                        <option value="4:5">4:5 (Portrait)</option>
+                    </select>
+                </div>
+                
+                <div class="select-group">
+                    <label>Model AI</label>
+                    <select id="model">
+                        <option value="flux">Flux (Terbaik)</option>
+                        <option value="flux-realism">Photorealistic</option>
+                        <option value="flux-anime">Anime Style</option>
+                        <option value="flux-3d">3D Render</option>
+                        <option value="any-dark">Dark Fantasy</option>
                         <option value="turbo">Turbo (Cepat)</option>
                     </select>
                 </div>
 
-                <div class="setting-item">
-                    <label><i class="fas fa-expand"></i> Rasio</label>
-                    <select id="aspectRatio">
-                        <option value="9:16">9:16 (Story/HP)</option>
-                        <option value="16:9">16:9 (Landscape)</option>
-                        <option value="1:1">1:1 (Kotak)</option>
-                        <option value="4:5">4:5 (IG Portrait)</option>
-                    </select>
-                </div>
-
-                <div class="setting-item full-width">
-                    <label><i class="fas fa-palette"></i> Gaya Visual</label>
-                    <select id="styleSelect">
-                        <option value="">No Style (Natural)</option>
+                <div class="select-group full">
+                    <label>Style & Efek</label>
+                    <select id="style">
+                        <option value="">Normal / No Style</option>
                         <option value="Surrealism">Surrealism</option>
                         <option value="Cyberpunk">Cyberpunk</option>
-                        <option value="Macabre">Macabre / Horror</option>
                         <option value="Psychedelic">Psychedelic</option>
+                        <option value="Macabre">Macabre / Horror</option>
                         <option value="Chaotic">Chaotic Art</option>
-                        <option value="Dark Fantasy">Dark Fantasy</option>
                         <option value="Fractal">Fractal</option>
-                        <option value="Anime">Anime Style</option>
+                        <option value="Gothic">Gothic</option>
                         <option value="Synthwave">Synthwave</option>
+                        <option value="Ukiyo-e">Japanese Ukiyo-e</option>
                     </select>
                 </div>
             </div>
 
-            <button id="generateBtn" onclick="generateImage()">
-                <i class="fas fa-bolt"></i> GENERATE IMAGE
+            <button onclick="generateArt()" class="btn-main">
+                <i class="fas fa-magic"></i> BUAT GAMBAR
             </button>
-        </div>
+        </section>
 
-        <div class="output-panel">
-            <div class="image-wrapper">
-                <div id="loader" class="loader" style="display: none;">
+        <section class="result-area">
+            <div class="preview-box">
+                <div id="loading" class="loader" style="display: none;">
                     <div class="spinner"></div>
                     <p>Sedang Menggambar...</p>
+                    <small>Tunggu 5-10 detik</small>
                 </div>
-                
+
                 <div id="placeholder" class="placeholder">
                     <i class="fas fa-image"></i>
-                    <p>Hasil gambar akan muncul di sini</p>
+                    <p>Hasil akan muncul di sini</p>
                 </div>
 
-                <img id="resultImage" style="display: none;" alt="Hasil AI" onclick="viewImage(this.src)">
+                <img id="outputImage" alt="Hasil AI" style="display: none;">
+                
+                <div id="errorMsg" class="error-msg" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Gagal memuat preview.</p>
+                    <a id="manualLink" href="#" target="_blank">Klik untuk buka gambar manual</a>
+                </div>
             </div>
 
-            <div id="actionButtons" class="action-buttons" style="display: none;">
-                <a id="downloadBtn" href="#" target="_blank" class="btn-action download">
+            <div id="actions" class="actions" style="display: none;">
+                <a id="downloadBtn" href="#" target="_blank" class="btn-action dl">
                     <i class="fas fa-download"></i> Simpan HD
                 </a>
-                <span id="seedInfo">Seed: -</span>
+                <button onclick="copyLink()" class="btn-action secondary">
+                    <i class="fas fa-link"></i> Salin Link
+                </button>
             </div>
-        </div>
+        </section>
     </div>
 
     <script src="script.js"></script>
