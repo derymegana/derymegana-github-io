@@ -1,80 +1,78 @@
 const BASE_URL = "https://image.pollinations.ai/prompt/";
 
-function generateImage() {
-    const promptInput = document.getElementById('promptInput').value.trim();
-    if (!promptInput) {
-        alert("Wajib isi deskripsi gambar dulu ya!");
-        return;
-    }
+function generateArt() {
+    const promptText = document.getElementById('prompt').value.trim();
+    if (!promptText) return alert("Isi deskripsi gambar dulu!");
 
-    // UI Elements
-    const loader = document.getElementById('loader');
-    const resultImg = document.getElementById('resultImage');
+    // UI ELEMENTS
+    const imgEl = document.getElementById('outputImage');
+    const loader = document.getElementById('loading');
     const placeholder = document.getElementById('placeholder');
-    const actionBtns = document.getElementById('actionButtons');
-    const downloadLink = document.getElementById('downloadBtn');
-    const seedInfo = document.getElementById('seedInfo');
+    const errorMsg = document.getElementById('errorMsg');
+    const actions = document.getElementById('actions');
+    const dlBtn = document.getElementById('downloadBtn');
+    const manualLink = document.getElementById('manualLink');
 
-    // Reset UI
-    loader.style.display = "block";
-    resultImg.style.display = "none";
+    // RESET TAMPILAN
+    loader.style.display = "flex";
     placeholder.style.display = "none";
-    actionBtns.style.display = "none";
+    imgEl.style.display = "none";
+    errorMsg.style.display = "none";
+    actions.style.display = "none";
 
-    // Ambil Parameter
-    const model = document.getElementById('modelSelect').value;
-    const ratio = document.getElementById('aspectRatio').value;
-    const style = document.getElementById('styleSelect').value;
+    // PARAMETER
+    const model = document.getElementById('model').value;
+    const ratio = document.getElementById('ratio').value;
+    const style = document.getElementById('style').value;
 
-    // Tentukan Resolusi
-    let width = 1024, height = 1024;
-    if (ratio === "16:9") { width = 1280; height = 720; }
-    else if (ratio === "9:16") { width = 720; height = 1280; }
-    else if (ratio === "4:5") { width = 864; height = 1080; }
+    let w = 1024, h = 1024;
+    if (ratio === "16:9") { w = 1280; h = 720; }
+    else if (ratio === "9:16") { w = 720; h = 1280; }
+    else if (ratio === "4:5") { w = 864; h = 1080; }
 
-    // Prompt Engineering Otomatis
-    let finalPrompt = promptInput;
+    // PROMPT ENGINEERING
+    let finalPrompt = promptText;
     if (style) finalPrompt += `, ${style} style`;
-    // Menambahkan keyword wajib agar gambar bagus
-    finalPrompt += ", 8k resolution, highly detailed, masterpiece, sharp focus, HDR";
+    finalPrompt += ", 8k resolution, highly detailed, masterpiece, sharp focus, HDR, cinematic lighting";
 
-    // Seed Acak (PENTING: Agar gambar selalu baru)
+    // KONSTRUKSI URL (ANTI-CACHE)
     const seed = Math.floor(Math.random() * 1000000);
-
-    // Encode Prompt (PENTING: Agar spasi tidak error)
+    // encodeURIComponent WAJIB agar spasi tidak memutus link
     const encodedPrompt = encodeURIComponent(finalPrompt);
+    
+    // Parameter timestamp (&t=) memaksa browser memuat gambar baru
+    const timeStamp = Date.now(); 
+    
+    const imageUrl = `${BASE_URL}${encodedPrompt}?width=${w}&height=${h}&model=${model}&seed=${seed}&nologo=true&enhance=true&t=${timeStamp}`;
 
-    // Konstruksi URL
-    // Kita tambahkan parameter acak '?t=' di akhir agar browser tidak mengambil cache lama
-    const imageUrl = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=${model}&seed=${seed}&nologo=true&enhance=true`;
+    console.log("Requesting:", imageUrl); // Cek console untuk debug
 
-    console.log("Loading URL:", imageUrl); // Cek console jika error
+    // SET URL GAMBAR
+    imgEl.src = imageUrl;
+    
+    // UPDATE LINK MANUAL & DOWNLOAD
+    // Ini penting jika gambar tidak muncul di preview, user bisa klik manual
+    manualLink.href = imageUrl;
+    dlBtn.href = imageUrl;
 
-    // Load Gambar
-    resultImg.src = imageUrl;
-
-    resultImg.onload = function() {
+    // EVENT LISTENER
+    imgEl.onload = function() {
         loader.style.display = "none";
-        resultImg.style.display = "block";
-        actionBtns.style.display = "flex";
-        
-        // Update Link Download & Info
-        downloadLink.href = imageUrl;
-        seedInfo.innerText = `Seed: ${seed}`;
+        imgEl.style.display = "block";
+        actions.style.display = "flex";
     };
 
-    resultImg.onerror = function() {
+    imgEl.onerror = function() {
         loader.style.display = "none";
-        placeholder.style.display = "block";
-        alert("Gagal memuat gambar. Kemungkinan server sibuk atau prompt mengandung kata yang dilarang. Coba deskripsi lain.");
+        errorMsg.style.display = "block";
+        // Jangan alert, cukup tampilkan pesan error dan link manual
     };
 }
 
-function clearInput() {
-    document.getElementById('promptInput').value = "";
-    document.getElementById('promptInput').focus();
-}
-
-function viewImage(url) {
-    if(url) window.open(url, '_blank');
+function copyLink() {
+    const url = document.getElementById('downloadBtn').href;
+    if(url && url !== "#") {
+        navigator.clipboard.writeText(url);
+        alert("Link gambar disalin!");
+    }
 }
