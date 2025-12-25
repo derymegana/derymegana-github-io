@@ -3,228 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DERY AI - Generator Gambar AI</title>
+    <title>DERY AI GENERATOR</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="light-mode">
+<body>
+
     <div class="container">
         <header>
-            <div class="logo-header">
-                <img src="assets/logo.png" alt="DERY AI Logo" class="logo">
-                <h1>DERY AI GENERATOR</h1>
-            </div>
-            <div class="header-controls">
-                <button id="languageToggle">EN/ID</button>
-                <button id="themeToggle"><i class="fas fa-moon"></i></button>
-            </div>
+            <h1>DERY AI <span class="highlight">GENERATOR</span></h1>
+            <p>Next-Gen Flux Implementation</p>
         </header>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="image-tab"><i class="fas fa-image"></i> Image Generation</button>
-            <button class="tab-btn" data-tab="audio-tab"><i class="fas fa-music"></i> Text to Speech</button>
-            <button class="tab-btn" data-tab="chat-tab"><i class="fas fa-comments"></i> AI Chat</button>
-        </div>
+        <main class="generator-box">
+            <div class="controls-section">
+                
+                <div class="input-group full-width">
+                    <label>Prompt (Deskripsi Gambar)</label>
+                    <textarea id="promptInput" placeholder="Contoh: A cyberpunk city with neon lights, raining, reflection..."></textarea>
+                </div>
 
-        <div class="tab-content active" id="image-tab">
-            <div class="controls">
-                <div class="prompt-section">
-                    <textarea id="promptInput" placeholder="Enter your image description..."></textarea>
-                    <div class="prompt-controls">
-                        <button id="enhancePrompt"><i class="fas fa-magic"></i> Enhance</button>
-                        <button id="ultraEnhanceBtn"><i class="fas fa-stars"></i> Ultra Enhance</button>
-                        <button id="randomPrompt"><i class="fas fa-random"></i> Random</button>
-                        <button id="clearPromptsBtn" style="background: linear-gradient(45deg, #e74c3c, #c0392b);"><i class="fas fa-eraser"></i> Clear Prompts</button>
+                <div class="grid-controls">
+                    <div class="input-group">
+                        <label>Model AI</label>
+                        <select id="modelSelect">
+                            <option value="flux">Flux (Standard)</option>
+                            <option value="flux-realism">Flux Realism</option>
+                            <option value="flux-anime">Flux Anime</option>
+                            <option value="flux-3d">Flux 3D</option>
+                            <option value="any-dark">Any Dark</option>
+                            <option value="turbo">Turbo (Fast)</option>
+                        </select>
                     </div>
-                    <textarea id="negativePrompt" placeholder="Negative prompt (what you don't want to see)..."></textarea>
+
+                    <div class="input-group">
+                        <label>Aspek Rasio</label>
+                        <select id="aspectRatio">
+                            <option value="1:1">1:1 (Square - 1024x1024)</option>
+                            <option value="16:9">16:9 (Landscape - 1280x720)</option>
+                            <option value="9:16">9:16 (Portrait - 720x1280)</option>
+                            <option value="4:3">4:3 (Classic - 1152x864)</option>
+                            <option value="3:4">3:4 (Tall - 864x1152)</option>
+                            <option value="21:9">21:9 (Cinematic - 1536x640)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Art Style / Efek</label>
+                        <select id="styleSelect">
+                            <option value="">None (Raw)</option>
+                            <option value="Surreal">Surreal</option>
+                            <option value="Chaotic">Chaotic</option>
+                            <option value="Psychedelic">Psychedelic</option>
+                            <option value="Macabre">Macabre</option>
+                            <option value="Cyberpunk">Cyberpunk</option>
+                            <option value="Steampunk">Steampunk</option>
+                            <option value="Gothic Fantasy">Gothic Fantasy</option>
+                            <option value="Synthwave">Synthwave</option>
+                            <option value="Ukiyo-e">Ukiyo-e</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Seed (Opsional)</label>
+                        <input type="number" id="seedInput" placeholder="Acak jika kosong">
+                    </div>
+                </div>
+
+                <div class="toggles">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="enhancePrompt" checked>
+                        <span class="checkmark"></span>
+                        Enhance Prompt (Auto-Detail)
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="qualityBoost" checked>
+                        <span class="checkmark"></span>
+                        High Quality (8K, Masterpiece)
+                    </label>
+                </div>
+
+                <button id="generateBtn" onclick="generateImage()">
+                    <i class="fas fa-magic"></i> GENERATE
+                </button>
+            </div>
+
+            <div class="output-section">
+                <div id="imageContainer" class="image-placeholder">
+                    <div class="loader" id="loader"></div>
+                    <img id="resultImage" src="" alt="Generated Image" style="display: none;">
+                    <div class="placeholder-text" id="placeholderText">Gambar akan muncul di sini</div>
                 </div>
                 
-                <div class="settings-grid">
-                    <div class="settings-column">
-                        <div class="setting-group">
-                            <label for="model">Model AI:</label>
-                            <select id="model">
-                                <option value="default">Default (Pollinations)</option>
-                                <option value="nanobanana">Nanobanana (Fast & Stylized)</option>
-                                <option value="seedream">Seedream (High Quality)</option>
-                                <option value="imagen4">Imagen 4 (Google)</option>
-                                <option value="gptimage">GPT-Image</option>
-                                <option value="flux">Flux</option>
-                                <option value="turbo">Turbo</option>
-                                <option value="dalle3">DALL-E 3</option>
-                                <option value="midjourney">Midjourney</option>
-                                <option value="stablediffusion">Stable Diffusion XL</option>
-                                <option value="kandinsky">Kandinsky</option>
-                                <option value="deepfloyd">DeepFloyd</option>
-                            </select>
-                        </div>
-                        
-                        <div class="setting-group">
-                            <label for="style">Base Style:</label>
-                            <select id="style">
-                                <option value="">Default</option>
-                                <option value="holographic">Holographic</option>
-                                <option value="etching">Etching</option>
-                                <option value="anime">Anime</option>
-                                <option value="manga">Manga</option>
-                                <option value="cartoon">Cartoon</option>
-                                <option value="3ddisney">3D Disney</option>
-                                <option value="pixar">Pixar</option>
-                                <option value="3drender">3D Render</option>
-                                <option value="picasso">Picasso</option>
-                                <option value="vangogh">Van Gogh</option>
-                                <option value="monet">Monet</option>
-                                <option value="warhol">Andy Warhol</option>
-                                <option value="streetart">Street Art</option>
-                                <option value="graffitiart">Graffiti Art</option>
-                                <option value="pointilism">Pointilism</option>
-                                <option value="cubism">Cubism</option>
-                                <option value="minimalism">Minimalism</option>
-                            </select>
-                        </div>
-                        
-                        <div class="setting-group">
-                            <label for="aspectRatio">Aspect Ratio:</label>
-                            <select id="aspectRatio">
-                                <option value="1:1">Square (1:1)</option>
-                                <option value="4:3">Standard (4:3)</option>
-                                <option value="16:9">Widescreen (16:9)</option>
-                                <option value="9:16">Portrait (9:16)</option>
-                                <option value="3:2">Classic (3:2)</option>
-                                <option value="2:3">Tall (2:3)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="settings-column">
-                        <div class="setting-group">
-                            <label for="seed">Seed:</label>
-                            <div class="seed-controls">
-                                <input type="text" id="seed" placeholder="Random">
-                                <button id="randomSeedBtn"><i class="fas fa-dice"></i></button>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-group settings-row" style="display: flex; gap: 10px;">
-                            <div style="flex: 1;">
-                                <label for="width">Width:</label>
-                                <input type="number" id="width" value="1024" min="512" max="3840">
-                            </div>
-                            <div style="flex: 1;">
-                                <label for="height">Height:</label>
-                                <input type="number" id="height" value="1024" min="512" max="3840">
-                            </div>
-                        </div>
-                        
-                        <div class="setting-group">
-                            <label for="steps">Steps (50-100):</label>
-                            <input type="range" id="steps" min="50" max="100" value="70">
-                            <span id="stepsValue">70</span>
-                        </div>
-                    </div>
-                    
-                    <div class="settings-column">
-                        <div class="setting-group">
-                            <label for="advancedStyle">Advanced Style:</label>
-                            <select id="advancedStyle">
-                                <option value="">None</option>
-                                <option value="hyperrealism">Hyperrealism</option>
-                                <option value="cinematic">Cinematic</option>
-                                <option value="oilpainting">Oil Painting</option>
-                                <option value="watercolor">Watercolor</option>
-                                <option value="fractal">Fractal</option>
-                                <option value="cyberpunk">Cyberpunk</option>
-                                <option value="steampunk">Steampunk</option>
-                                <option value="fantasy">Fantasy</option>
-                                <option value="surrealism">Surrealism</option>
-                                <option value="macabre">Macabre</option>
-                            </select>
-                        </div>
-
-                        <div class="setting-group">
-                            <label for="colorPalette">Color Palette:</label>
-                            <select id="colorPalette">
-                                <option value="">Default</option>
-                                <option value="vibrant">Vibrant</option>
-                                <option value="pastel">Pastel</option>
-                                <option value="monochrome">Monochrome</option>
-                                <option value="warm">Warm Tones</option>
-                                <option value="cool">Cool Tones</option>
-                                <option value="rgb">RGB</option>
-                            </select>
-                        </div>
-                        
-                        <div class="setting-group">
-                            <label for="composition">Composition:</label>
-                            <select id="composition">
-                                <option value="">Default</option>
-                                <option value="closeup">Close-up</option>
-                                <option value="wide">Wide Shot</option>
-                                <option value="askew">Askew view</option>
-                                <option value="macro">Macro</option>
-                                <option value="aerial">Aerial</option>
-                                <option value="lowangle">Low angle</option>
-                                <option value="drone">Drone view</option>
-                            </select>
-                        </div>
-                        
-                        <div class="setting-group checkbox-group">
-                            <input type="checkbox" id="nsfwToggle">
-                            <label for="nsfwToggle">NSFW Content</label>
-                        </div>
-                    </div>
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <a id="downloadBtn" href="#" download="dery-ai-result.png" class="btn-secondary">
+                        <i class="fas fa-download"></i> Download PNG
+                    </a>
                 </div>
-                
-                <div class="generate-controls">
-                    <button id="generateBtn"><i class="fas fa-cogs"></i> GENERATE IMAGE</button>
-                    <button id="advancedBtn"><i class="fas fa-sliders-h"></i> Advanced</button>
-                    <button id="img2imgBtn" style="background: linear-gradient(45deg, #3498db, #2ecc71);"><i class="fas fa-image"></i> Use as Base Image</button>
-                </div>
+                <div id="statusText">Siap Generate</div>
             </div>
-            
-            <div class="result">
-                <div class="loading" id="loading" style="display: none;">
-                    <div class="loading-animation">
-                        <div class="loading-text">DERY AI LOADING</div>
-                        <div class="loading-bar"></div>
-                    </div>
-                </div>
-                
-                <div class="image-container" id="imageContainer">
-                    <p id="imageCaption" style="font-style: italic; color: var(--text-color); margin-bottom: 10px; display: none;">Prompt: </p>
-                    <img id="generatedImage" alt="Generated image will appear here">
-                    <div class="image-controls" id="imageControls" style="display: none;">
-                        <button id="downloadBtn"><i class="fas fa-download"></i> Download</button>
-                        <button id="saveHistoryBtn"><i class="fas fa-save"></i> Save</button>
-                        <div class="social-share">
-                            <button class="share-btn facebook"><i class="fab fa-facebook"></i></button>
-                            <button class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></button>
-                            <button class="share-btn twitter"><i class="fab fa-twitter"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="history-section">
-                <h2><i class="fas fa-history"></i> Prompt History</h2>
-                <button id="clearHistoryBtn">Clear History</button>
-                <ul id="historyList"></ul>
-            </div>
-        </div>
-
-        <div class="tab-content" id="audio-tab">...</div>
-        <div class="tab-content" id="chat-tab">...</div>
+        </main>
         
         <footer>
-            <p>Copyright &copy; 2025 DERY AI GENERATOR</p>
-            <p>Powered by Pollinations API | Developed by Dery Lau</p>
-            <p>Thanks to Github, Cloudflare & DeepSeek</p>
+            &copy; 2025 DERY AI GENERATOR - Powered by Pollinations.ai
         </footer>
     </div>
-    
+
     <script src="script.js"></script>
-    <script src="tts.js"></script>
-    <script src="chat.js"></script>
 </body>
 </html>
