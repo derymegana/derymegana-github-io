@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DERY AI GENERATOR | Flux Model</title>
+    <title>DERY AI GENERATOR | Ultra HD</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -12,83 +12,99 @@
 
     <header>
         <div class="brand">
-            <i class="fas fa-robot"></i> DERY AI <span class="badge">FLUX PRO</span>
+            <i class="fas fa-brain"></i> DERY AI <span class="badge">ULTRA FLUX</span>
         </div>
     </header>
 
     <main class="container">
         <section class="controls">
+            
             <div class="form-group">
-                <label><i class="fas fa-pen-fancy"></i> Masukkan Prompt</label>
-                <textarea id="promptInput" placeholder="Deskripsikan imajinasimu secara detail... (Contoh: Samurai cyberpunk di tengah hujan neon, 8k, cinematic)"></textarea>
+                <label><i class="fas fa-pen-nib"></i> Masukkan Prompt</label>
+                <textarea id="promptInput" placeholder="Contoh: Seorang astronot duduk di kursi gaming di bulan, melihat bumi, refleksi visor sangat detail, 8k..."></textarea>
+            </div>
+
+            <div class="options-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-palette"></i> Gaya Artistik</label>
+                    <select id="styleInput">
+                        <option value="photorealistic">Realism (Foto Asli)</option>
+                        <option value="cinematic">Cinematic Movie</option>
+                        <option value="anime">Anime 3D (Ghibli/Pixar)</option>
+                        <option value="cyberpunk">Cyberpunk Neon</option>
+                        <option value="dark_fantasy">Dark Fantasy (RPG)</option>
+                        <option value="digital_art">Digital Art (Artstation)</option>
+                        <option value="vintage">Vintage / Retro</option>
+                        <option value="3d_render">3D Render (Unreal 5)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-expand"></i> Rasio Gambar</label>
+                    <select id="ratioInput">
+                        <option value="1024x1024">1:1 (Square)</option>
+                        <option value="1920x1080">16:9 (Wide HD)</option>
+                        <option value="1080x1920">9:16 (Story HD)</option>
+                        <option value="1280x1536">4:5 (Portrait Pro)</option>
+                        <option value="1536x640">21:9 (Ultrawide)</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
-                <label><i class="fas fa-palette"></i> Style Art</label>
-                <select id="styleInput">
-                    <option value="">Default (Flux Realism)</option>
-                    <option value="Surrealism, dreamlike">Surreal</option>
-                    <option value="Psychedelic, colorful, trippy">Psychedelic</option>
-                    <option value="Chaotic, glitchcore">Chaotic</option>
-                    <option value="Macabre, horror, dark">Macabre</option>
-                    <option value="Dark Fantasy, gothic">Dark Fantasy</option>
-                    <option value="Anime 3D, cgi render">Anime 3D</option>
-                    <option value="Cyberpunk, neon city">Cyberpunk</option>
-                    <option value="Ukiyo-e, japanese traditional">Ukiyo-e</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-crop-simple"></i> Aspek Rasio</label>
-                <select id="ratioInput">
-                    <option value="1024x1024">1:1 (Square - IG/Feed)</option>
-                    <option value="1280x720">16:9 (Landscape - YouTube)</option>
-                    <option value="720x1280">9:16 (Portrait - TikTok/Story)</option>
-                    <option value="1024x768">4:3 (Classic)</option>
-                    <option value="768x1024">3:4 (Portrait)</option>
+                <label><i class="fas fa-gem"></i> Tingkat Detail (Quality)</label>
+                <select id="qualityInput">
+                    <option value="extreme">🌟 Extreme Detail (Slow & Best)</option>
+                    <option value="high">🔥 High Quality (Balanced)</option>
+                    <option value="standard">⚡ Standard (Fast)</option>
                 </select>
             </div>
 
             <div class="toggle-wrapper">
-                <div class="toggle-container" onclick="document.getElementById('enhanceInput').click()">
-                    <span class="toggle-label"><i class="fas fa-wand-magic-sparkles"></i> Enhance Prompt (AI Fix)</span>
+                <div class="toggle-container" onclick="toggleCheckbox('enhanceInput')">
+                    <span class="toggle-label">
+                        <i class="fas fa-wand-magic-sparkles"></i> AI Magic Enhance
+                        <small style="display:block; color:#666; font-size:0.7em;">Otomatis memperbaiki pencahayaan & wajah</small>
+                    </span>
                     <input type="checkbox" id="enhanceInput" checked>
                 </div>
             </div>
 
             <button class="btn-generate" id="generateBtn">
-                <i class="fas fa-bolt"></i> Generate Image
+                <i class="fas fa-bolt"></i> Generate Ultra Image
             </button>
 
             <div class="history-section">
                 <div class="history-header">
-                    <label>History (Terbaru)</label>
-                    <button class="btn-clear" id="clearHistoryBtn">Hapus</button>
+                    <label>History</label>
+                    <button class="btn-clear" id="clearHistoryBtn">Hapus Semua</button>
                 </div>
-                <div class="history-grid" id="historyContainer">
-                    </div>
+                <div class="history-grid" id="historyContainer"></div>
             </div>
         </section>
 
         <section class="display-area">
             <div class="image-wrapper">
                 <div class="placeholder-text" id="placeholder">
-                    <i class="fas fa-image"></i>
-                    <h3>Siap Menciptakan Karya?</h3>
-                    <p>Masukkan prompt dan tekan generate.</p>
+                    <i class="fas fa-fingerprint"></i>
+                    <h3>DERY AI GENERATOR</h3>
+                    <p>Mode Ultra Detailed Aktif</p>
                 </div>
                 
-                <span class="loader" id="loader"></span>
+                <div class="loader-container" id="loader">
+                    <span class="loader"></span>
+                    <p class="loading-text">Merender Detail Tinggi...</p>
+                </div>
                 
                 <img src="" alt="AI Result" class="generated-img" id="resultImage">
             </div>
 
             <div class="image-actions" id="actionButtons">
                 <button class="btn-action primary" id="downloadBtn">
-                    <i class="fas fa-download"></i> Download HD
+                    <i class="fas fa-download"></i> Download 4K
                 </button>
                 <button class="btn-action secondary" id="fullscreenBtn">
-                    <i class="fas fa-expand"></i> Fullscreen
+                    <i class="fas fa-expand"></i>
                 </button>
             </div>
         </section>
