@@ -3,119 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DERY AI GENERATOR</title>
+    <title>DERY AI PRO | Next Gen Generator</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>DERY <span class="highlight">AI</span> GENERATOR</h1>
-            <p>Create Imagination into Reality</p>
-        </header>
+    <div class="background-glow"></div>
 
-        <div class="main-content">
-            <aside class="control-panel">
-                
-                <div class="form-group">
-                    <label>Deskripsi Gambar (Prompt)</label>
-                    <textarea id="promptInput" placeholder="Contoh: A cyberpunk cat in a neon city, raining, 8k resolution..."></textarea>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fas fa-robot"></i>
+                <h1>DERY<span class="gradient-text">AI</span></h1>
+            </div>
+
+            <div class="scrollable-content">
+                <div class="input-group">
+                    <label><i class="fas fa-pen-fancy"></i> Imajinasi Anda</label>
+                    <textarea id="promptInput" placeholder="Describe something amazing..."></textarea>
+                    <div class="enhance-wrapper">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enhanceToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">AI Prompt Enhancer</span>
+                    </div>
                 </div>
 
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Model AI</label>
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label><i class="fas fa-layer-group"></i> Model</label>
                         <select id="modelSelect">
-                            <option value="flux">Default (Flux)</option>
-                            <option value="flux-realism">Flux Realism (High Detail)</option>
+                            <option value="flux">Flux Realism (Best Quality)</option>
+                            <option value="turbo">Turbo (Super Fast)</option>
                             <option value="gpt-image">GPT-Image</option>
-                            <option value="turbo">Dall-E 5 (Turbo Style)</option>
                             <option value="stable-diffusion">Stable Diffusion XL</option>
-                            <option value="midjourney">Imagen 4 (Midjourney Style)</option>
-                            <option value="anime">Anime Diffusion</option>
+                            <option value="midjourney">Imagen 4</option>
+                            <option value="anime">Anime V3</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Art Style</label>
+
+                    <div class="input-group">
+                        <label><i class="fas fa-palette"></i> Style</label>
                         <select id="styleSelect">
-                            <option value="">Default (No Style)</option>
+                            <option value="">No Style (Raw)</option>
+                            <option value="cinematic lighting, 8k, photorealistic">Cinematic</option>
+                            <option value="cyberpunk, neon, futuristic">Cyberpunk</option>
+                            <option value="anime style, studio ghibli">Anime</option>
+                            <option value="dark fantasy, detailed, gloomy">Dark Fantasy</option>
+                            <option value="3d render, blender, octane">3D Render</option>
+                            <option value="oil painting, textured">Oil Painting</option>
                             <option value="surrealism, dreamlike">Surreal</option>
-                            <option value="psychedelic, vibrant colors, swirling patterns">Psychedelic</option>
-                            <option value="chaotic, destruction, entropy">Chaotic</option>
-                            <option value="macabre, horror, scary">Macabre</option>
-                            <option value="dark fantasy, grim, gothic">Dark Fantasy</option>
-                            <option value="3d render, octane render, c4d">Anime 3D</option>
-                            <option value="cyberpunk, neon lights">Cyberpunk</option>
-                            <option value="oil painting, classic art">Oil Painting</option>
                         </select>
                     </div>
-                </div>
 
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Aspek Rasio</label>
+                    <div class="input-group">
+                        <label><i class="fas fa-crop-simple"></i> Rasio</label>
                         <select id="ratioSelect">
-                            <option value="1024x1024">Square (1:1)</option>
-                            <option value="1280x720">Landscape (16:9)</option>
-                            <option value="720x1280">Portrait (9:16)</option>
-                            <option value="1024x768">Classic (4:3)</option>
-                            <option value="768x1024">Vertical (3:4)</option>
-                            <option value="1920x1080">Wide Cinema (HD)</option>
+                            <option value="1024x1024">1:1 (Square)</option>
+                            <option value="1280x720">16:9 (Landscape)</option>
+                            <option value="720x1280">9:16 (Story/TikTok)</option>
+                            <option value="1024x768">4:3 (Classic)</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Seed (Opsional)</label>
-                        <input type="number" id="seedInput" placeholder="Acak jika kosong">
+
+                    <div class="input-group">
+                        <label><i class="fas fa-bolt"></i> Speed Mode</label>
+                        <select id="qualitySelect">
+                            <option value="hd">HD Quality (Slower)</option>
+                            <option value="fast">Turbo Speed (Faster)</option>
+                        </select>
                     </div>
                 </div>
-
-                <div class="toggles">
-                    <label class="switch-container">
-                        <input type="checkbox" id="enhanceToggle" checked>
-                        <span class="checkmark"></span>
-                        <span class="label-text">Enhance Prompt (Magic)</span>
-                    </label>
+                
+                <div class="input-group">
+                     <label>Seed (Opsional)</label>
+                     <input type="number" id="seedInput" placeholder="Random..." class="compact-input">
                 </div>
 
                 <button id="generateBtn" onclick="generateImage()">
-                    <i class="fas fa-magic"></i> GENERATE ART
+                    <span class="btn-content">GENERATE <i class="fas fa-arrow-right"></i></span>
+                    <div class="btn-glow"></div>
                 </button>
-            </aside>
+            </div>
+            
+            <div class="footer-info">
+                <p>v2.0 | Powered by Pollinations</p>
+            </div>
+        </aside>
 
-            <main class="output-panel">
-                <div id="imageWrapper" class="image-wrapper">
-                    <div class="placeholder">
-                        <i class="fas fa-image"></i>
-                        <p>Gambar Anda akan muncul di sini</p>
-                    </div>
-                    <img id="resultImage" src="" alt="AI Generated" style="display: none;">
-                    <div id="loading" class="loading" style="display: none;">
-                        <div class="spinner"></div>
-                        <p>Sedang Meracik Pixel...</p>
+        <main class="preview-area">
+            <div class="mobile-header">
+                <h2>DERY<span class="gradient-text">AI</span></h2>
+            </div>
+
+            <div class="image-container" id="imageContainer">
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-cube fa-spin-pulse"></i>
+                    <h3>Siap Menciptakan Karya</h3>
+                    <p>Masukkan prompt dan tekan Generate</p>
+                </div>
+
+                <div class="loader-overlay" id="loader">
+                    <div class="scanner-line"></div>
+                    <div class="loader-content">
+                        <div class="spinner-ring"></div>
+                        <p id="loadingText">Menginisialisasi AI...</p>
                     </div>
                 </div>
 
-                <div class="action-buttons" id="actionButtons" style="display: none;">
-                    <button class="btn-secondary" onclick="downloadImage()">
-                        <i class="fas fa-download"></i> Download PNG
+                <img id="resultImage" src="" alt="Result" onload="onImageLoad()" onerror="onImageError()">
+                
+                <div class="image-actions" id="imageActions">
+                    <button onclick="downloadImage()" class="action-btn download">
+                        <i class="fas fa-download"></i> Save HD
+                    </button>
+                    <button onclick="copyPrompt()" class="action-btn copy">
+                        <i class="fas fa-copy"></i> Copy Prompt
                     </button>
                 </div>
-            </main>
-        </div>
-
-        <section class="history-section">
-            <div class="history-header">
-                <h3><i class="fas fa-history"></i> Riwayat Prompt</h3>
-                <button onclick="clearHistory()" class="clear-btn">Hapus Semua</button>
             </div>
-            <div id="historyList" class="history-list">
-                </div>
-        </section>
 
-        <footer>
-            <p>&copy; 2025 DERY AI GENERATOR. Powered by Pollinations AI.</p>
-        </footer>
+            <div class="history-bar">
+                <div class="history-label">History <button onclick="clearHistory()"><i class="fas fa-trash"></i></button></div>
+                <div class="history-track" id="historyList">
+                    </div>
+            </div>
+        </main>
     </div>
 
     <script src="script.js"></script>
