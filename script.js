@@ -1,167 +1,188 @@
-// Konfigurasi
+/* --- CONFIGURATION --- */
 const BASE_URL = "https://image.pollinations.ai/prompt/";
 let currentImageUrl = "";
 
-// Mengambil Elemen DOM
-const promptInput = document.getElementById('promptInput');
-const styleInput = document.getElementById('styleInput');
-const ratioInput = document.getElementById('ratioInput');
-const enhanceInput = document.getElementById('enhanceInput');
-const generateBtn = document.getElementById('generateBtn');
-const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
+// KAMUS STYLE & QUALITY BOOSTERS
+// Ini adalah "bumbu rahasia" untuk membuat gambar menjadi ultra detail
+const styles = {
+    photorealistic: "photorealistic, shot on 70mm lens, depth of field, 8k textures, raytracing, highly detailed",
+    cinematic: "cinematic lighting, movie scene, imax quality, color graded, dramatic atmosphere, ultra wide shot",
+    anime: "anime style, studio ghibli, makoto shinkai, cgsociety, detailed lines, vibrant colors, 4k",
+    cyberpunk: "cyberpunk, neon lights, futuristic city, chrome reflections, high contrast, blade runner vibe",
+    dark_fantasy: "dark fantasy, gothic atmosphere, mysterious, volumetric fog, eldritch, hyperdetailed",
+    digital_art: "digital painting, artstation trends, concept art, sharp focus, masterpiece, smooth composition",
+    vintage: "vintage aesthetic, retro photography, film grain, polaroid style, nostalgic, 1980s",
+    "3d_render": "unreal engine 5 render, octane render, 3d masterpiece, physcially based rendering, 8k"
+};
 
-const resultImage = document.getElementById('resultImage');
-const loader = document.getElementById('loader');
-const placeholder = document.getElementById('placeholder');
-const actionButtons = document.getElementById('actionButtons');
-const historyContainer = document.getElementById('historyContainer');
+const qualityBoosters = {
+    standard: "",
+    high: "high quality, sharp details, hd, 4k",
+    extreme: "masterpiece, best quality, ultra detailed, 8k resolution, hdr, intricate details, professional photography, perfect composition, no blur"
+};
 
-// Event Listeners
+/* --- DOM ELEMENTS --- */
+const els = {
+    prompt: document.getElementById('promptInput'),
+    style: document.getElementById('styleInput'),
+    ratio: document.getElementById('ratioInput'),
+    quality: document.getElementById('qualityInput'),
+    enhance: document.getElementById('enhanceInput'),
+    btnGenerate: document.getElementById('generateBtn'),
+    btnClear: document.getElementById('clearHistoryBtn'),
+    btnDownload: document.getElementById('downloadBtn'),
+    btnFullscreen: document.getElementById('fullscreenBtn'),
+    img: document.getElementById('resultImage'),
+    loader: document.getElementById('loader'),
+    placeholder: document.getElementById('placeholder'),
+    actions: document.getElementById('actionButtons'),
+    history: document.getElementById('historyContainer')
+};
+
+/* --- INITIALIZATION --- */
 document.addEventListener('DOMContentLoaded', loadHistory);
-generateBtn.addEventListener('click', generateImage);
-clearHistoryBtn.addEventListener('click', clearHistory);
-downloadBtn.addEventListener('click', downloadImage);
-fullscreenBtn.addEventListener('click', () => {
-    if (resultImage.src) window.open(resultImage.src, '_blank');
+els.btnGenerate.addEventListener('click', generateImage);
+els.btnClear.addEventListener('click', clearHistory);
+els.btnDownload.addEventListener('click', downloadImage);
+els.btnFullscreen.addEventListener('click', () => {
+    if (els.img.src) window.open(els.img.src, '_blank');
 });
 
-// Fungsi Utama Generate
+// Helper untuk Toggle Checkbox dari div container
+window.toggleCheckbox = (id) => {
+    const cb = document.getElementById(id);
+    cb.checked = !cb.checked;
+}
+
+/* --- CORE LOGIC --- */
 async function generateImage() {
-    const promptRaw = promptInput.value.trim();
+    const userPrompt = els.prompt.value.trim();
     
-    if (!promptRaw) {
-        alert("Harap masukkan deskripsi gambar (Prompt) terlebih dahulu!");
+    if (!userPrompt) {
+        alert("⚠️ Masukkan deskripsi gambar terlebih dahulu!");
+        els.prompt.focus();
         return;
     }
 
-    // Ubah status UI jadi Loading
     setLoading(true);
 
-    // Siapkan Parameter
-    const style = styleInput.value;
-    // Menggabungkan style ke dalam prompt agar hasil lebih akurat
-    const finalPrompt = style ? `${promptRaw}, ${style}, highly detailed, 8k resolution` : promptRaw;
-    const [width, height] = ratioInput.value.split('x');
-    const isEnhance = enhanceInput.checked;
-    
-    // Seed Random agar gambar selalu baru meskipun prompt sama
-    const seed = Math.floor(Math.random() * 1000000); 
+    // 1. Ambil Parameter
+    const styleKey = els.style.value;
+    const qualityKey = els.quality.value;
+    const [width, height] = els.ratio.value.split('x');
+    const isEnhance = els.enhance.checked;
+    const seed = Math.floor(Math.random() * 999999999);
 
-    // Encode Prompt URL
-    const encodedPrompt = encodeURIComponent(finalPrompt);
+    // 2. PROMPT ENGINEERING (Penggabungan Pintar)
+    // Format: [User Prompt] + [Style Keywords] + [Quality Booster]
+    let finalPrompt = userPrompt;
     
-    // Susun URL Final
-    const url = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=flux&quality=hd&enhance=${isEnhance}&nologo=true&private=false&seed=${seed}`;
+    if (styleKey && styles[styleKey]) {
+        finalPrompt += `, ${styles[styleKey]}`;
+    }
+    
+    if (qualityBoosters[qualityKey]) {
+        finalPrompt += `, ${qualityBoosters[qualityKey]}`;
+    }
+
+    // 3. Construct URL
+    // nologo=true : Hilangkan watermark
+    // private=true : Privasi lebih terjaga (jika didukung API key)
+    // model=flux : Model terbaik saat ini untuk detail
+    const encodedPrompt = encodeURIComponent(finalPrompt);
+    const url = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=flux&seed=${seed}&nologo=true&enhance=${isEnhance}&quality=hd`;
 
     currentImageUrl = url;
 
-    // Load Gambar
-    resultImage.onload = () => {
+    // 4. Load Image
+    els.img.onload = () => {
         setLoading(false);
         saveToHistory(url);
     };
 
-    resultImage.onerror = () => {
+    els.img.onerror = () => {
         setLoading(false);
-        alert("Gagal membuat gambar. Coba persingkat prompt atau coba lagi nanti.");
+        alert("Gagal memuat gambar. Server mungkin sedang sibuk.");
     };
 
-    resultImage.src = url;
+    els.img.src = url;
 }
 
-// Fungsi Mengatur Tampilan Loading
 function setLoading(isLoading) {
     if (isLoading) {
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Membuat...';
-        loader.style.display = 'block';
-        placeholder.style.display = 'none';
-        resultImage.style.display = 'none';
-        actionButtons.classList.remove('active');
+        els.btnGenerate.disabled = true;
+        els.btnGenerate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rendering Pixels...';
+        els.loader.style.display = 'block';
+        els.placeholder.style.display = 'none';
+        els.img.style.display = 'none';
+        els.actions.classList.remove('active');
     } else {
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = '<i class="fas fa-bolt"></i> Generate Image';
-        loader.style.display = 'none';
-        resultImage.style.display = 'block';
-        actionButtons.classList.add('active');
+        els.btnGenerate.disabled = false;
+        els.btnGenerate.innerHTML = '<i class="fas fa-bolt"></i> Generate Ultra Image';
+        els.loader.style.display = 'none';
+        els.img.style.display = 'block';
+        els.actions.classList.add('active');
     }
 }
 
-// Fungsi Download (Mengatasi masalah CORS/Tab baru)
+/* --- DOWNLOAD & HISTORY --- */
 async function downloadImage() {
     if (!currentImageUrl) return;
-
+    const originalText = els.btnDownload.innerHTML;
+    
     try {
-        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        
+        els.btnDownload.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading...';
         const response = await fetch(currentImageUrl);
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        
         const a = document.createElement('a');
         a.href = url;
-        // Nama file unik berdasarkan waktu
-        a.download = `dery-ai-gen-${Date.now()}.jpg`;
+        a.download = `DERY-AI-${Date.now()}.jpg`;
         document.body.appendChild(a);
         a.click();
-        
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
-        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download HD';
-    } catch (error) {
-        console.error(error);
-        alert("Gagal download otomatis. Silakan 'Klik Kanan > Save Image' pada gambar.");
-        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download HD';
+    } catch (e) {
+        alert("Gunakan Klik Kanan > Save Image As");
+    } finally {
+        els.btnDownload.innerHTML = originalText;
     }
 }
 
-// --- FUNGSI HISTORY ---
-
 function saveToHistory(url) {
-    let history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
-    
-    // Tambah ke awal array
-    history.unshift(url);
-    
-    // Batasi maks 12 gambar
-    if (history.length > 12) history.pop();
-    
-    localStorage.setItem('deryAiHistory', JSON.stringify(history));
+    let history = JSON.parse(localStorage.getItem('deryAiUltraHistory')) || [];
+    if (!history.includes(url)) {
+        history.unshift(url);
+        if (history.length > 8) history.pop(); // Simpan 8 terakhir agar tidak berat
+        localStorage.setItem('deryAiUltraHistory', JSON.stringify(history));
+    }
     renderHistory();
 }
 
-function loadHistory() {
-    renderHistory();
-}
+function loadHistory() { renderHistory(); }
 
 function renderHistory() {
-    const history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
-    historyContainer.innerHTML = '';
-
+    const history = JSON.parse(localStorage.getItem('deryAiUltraHistory')) || [];
+    els.history.innerHTML = '';
     history.forEach(url => {
         const div = document.createElement('div');
         div.className = 'history-item';
-        div.innerHTML = `<img src="${url}" loading="lazy" alt="History Item">`;
-        
-        // Klik history untuk load kembali ke preview utama
+        div.innerHTML = `<img src="${url}" loading="lazy">`;
         div.onclick = () => {
             setLoading(true);
             currentImageUrl = url;
-            resultImage.src = url;
-            // Kita tidak perlu trigger saveToHistory lagi saat restore
-            resultImage.onload = () => setLoading(false);
+            els.img.src = url;
+            // Load ulang event handler manual karena onload tidak selalu trigger jika cache
+            if (els.img.complete) setLoading(false);
+            else els.img.onload = () => setLoading(false);
         };
-        
-        historyContainer.appendChild(div);
+        els.history.appendChild(div);
     });
 }
 
 function clearHistory() {
-    if(confirm("Yakin ingin menghapus semua riwayat?")) {
-        localStorage.removeItem('deryAiHistory');
+    if (confirm("Hapus history?")) {
+        localStorage.removeItem('deryAiUltraHistory');
         renderHistory();
     }
 }
