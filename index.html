@@ -2,104 +2,97 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DERY AI • ULTIMATE</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DERY AI GENERATOR | Flux Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="main-container">
-        <header>
-            <div class="brand">
-                <i class="fas fa-shapes"></i> DERY AI <span>PRO</span>
-            </div>
-            <div class="status-dot" id="connectionStatus" title="Status Sistem"></div>
-        </header>
+    <header>
+        <div class="brand">
+            <i class="fas fa-robot"></i> DERY AI <span class="badge">FLUX PRO</span>
+        </div>
+    </header>
 
+    <main class="container">
         <section class="controls">
-            <div class="input-wrapper">
-                <textarea id="prompt" placeholder="Deskripsikan gambar di sini... (Contoh: A cyberpunk cat in neon city, 8k render)"></textarea>
+            <div class="form-group">
+                <label><i class="fas fa-pen-fancy"></i> Masukkan Prompt</label>
+                <textarea id="promptInput" placeholder="Deskripsikan imajinasimu secara detail... (Contoh: Samurai cyberpunk di tengah hujan neon, 8k, cinematic)"></textarea>
             </div>
 
-            <div class="settings">
-                <div class="select-group">
-                    <label>Ukuran</label>
-                    <select id="ratio">
-                        <option value="9:16">9:16 (Story)</option>
-                        <option value="16:9">16:9 (Landscape)</option>
-                        <option value="1:1">1:1 (Kotak)</option>
-                        <option value="4:5">4:5 (Portrait)</option>
-                    </select>
-                </div>
-                
-                <div class="select-group">
-                    <label>Model AI</label>
-                    <select id="model">
-                        <option value="flux">Flux (Terbaik)</option>
-                        <option value="flux-realism">Photorealistic</option>
-                        <option value="flux-anime">Anime Style</option>
-                        <option value="flux-3d">3D Render</option>
-                        <option value="any-dark">Dark Fantasy</option>
-                        <option value="turbo">Turbo (Cepat)</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label><i class="fas fa-palette"></i> Style Art</label>
+                <select id="styleInput">
+                    <option value="">Default (Flux Realism)</option>
+                    <option value="Surrealism, dreamlike">Surreal</option>
+                    <option value="Psychedelic, colorful, trippy">Psychedelic</option>
+                    <option value="Chaotic, glitchcore">Chaotic</option>
+                    <option value="Macabre, horror, dark">Macabre</option>
+                    <option value="Dark Fantasy, gothic">Dark Fantasy</option>
+                    <option value="Anime 3D, cgi render">Anime 3D</option>
+                    <option value="Cyberpunk, neon city">Cyberpunk</option>
+                    <option value="Ukiyo-e, japanese traditional">Ukiyo-e</option>
+                </select>
+            </div>
 
-                <div class="select-group full">
-                    <label>Style & Efek</label>
-                    <select id="style">
-                        <option value="">Normal / No Style</option>
-                        <option value="Surrealism">Surrealism</option>
-                        <option value="Cyberpunk">Cyberpunk</option>
-                        <option value="Psychedelic">Psychedelic</option>
-                        <option value="Macabre">Macabre / Horror</option>
-                        <option value="Chaotic">Chaotic Art</option>
-                        <option value="Fractal">Fractal</option>
-                        <option value="Gothic">Gothic</option>
-                        <option value="Synthwave">Synthwave</option>
-                        <option value="Ukiyo-e">Japanese Ukiyo-e</option>
-                    </select>
+            <div class="form-group">
+                <label><i class="fas fa-crop-simple"></i> Aspek Rasio</label>
+                <select id="ratioInput">
+                    <option value="1024x1024">1:1 (Square - IG/Feed)</option>
+                    <option value="1280x720">16:9 (Landscape - YouTube)</option>
+                    <option value="720x1280">9:16 (Portrait - TikTok/Story)</option>
+                    <option value="1024x768">4:3 (Classic)</option>
+                    <option value="768x1024">3:4 (Portrait)</option>
+                </select>
+            </div>
+
+            <div class="toggle-wrapper">
+                <div class="toggle-container" onclick="document.getElementById('enhanceInput').click()">
+                    <span class="toggle-label"><i class="fas fa-wand-magic-sparkles"></i> Enhance Prompt (AI Fix)</span>
+                    <input type="checkbox" id="enhanceInput" checked>
                 </div>
             </div>
 
-            <button onclick="generateArt()" class="btn-main">
-                <i class="fas fa-magic"></i> BUAT GAMBAR
+            <button class="btn-generate" id="generateBtn">
+                <i class="fas fa-bolt"></i> Generate Image
             </button>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <label>History (Terbaru)</label>
+                    <button class="btn-clear" id="clearHistoryBtn">Hapus</button>
+                </div>
+                <div class="history-grid" id="historyContainer">
+                    </div>
+            </div>
         </section>
 
-        <section class="result-area">
-            <div class="preview-box">
-                <div id="loading" class="loader" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Sedang Menggambar...</p>
-                    <small>Tunggu 5-10 detik</small>
-                </div>
-
-                <div id="placeholder" class="placeholder">
+        <section class="display-area">
+            <div class="image-wrapper">
+                <div class="placeholder-text" id="placeholder">
                     <i class="fas fa-image"></i>
-                    <p>Hasil akan muncul di sini</p>
+                    <h3>Siap Menciptakan Karya?</h3>
+                    <p>Masukkan prompt dan tekan generate.</p>
                 </div>
-
-                <img id="outputImage" alt="Hasil AI" style="display: none;">
                 
-                <div id="errorMsg" class="error-msg" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>Gagal memuat preview.</p>
-                    <a id="manualLink" href="#" target="_blank">Klik untuk buka gambar manual</a>
-                </div>
+                <span class="loader" id="loader"></span>
+                
+                <img src="" alt="AI Result" class="generated-img" id="resultImage">
             </div>
 
-            <div id="actions" class="actions" style="display: none;">
-                <a id="downloadBtn" href="#" target="_blank" class="btn-action dl">
-                    <i class="fas fa-download"></i> Simpan HD
-                </a>
-                <button onclick="copyLink()" class="btn-action secondary">
-                    <i class="fas fa-link"></i> Salin Link
+            <div class="image-actions" id="actionButtons">
+                <button class="btn-action primary" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download HD
+                </button>
+                <button class="btn-action secondary" id="fullscreenBtn">
+                    <i class="fas fa-expand"></i> Fullscreen
                 </button>
             </div>
         </section>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
