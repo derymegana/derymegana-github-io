@@ -1,78 +1,167 @@
+// Konfigurasi
 const BASE_URL = "https://image.pollinations.ai/prompt/";
+let currentImageUrl = "";
 
-function generateArt() {
-    const promptText = document.getElementById('prompt').value.trim();
-    if (!promptText) return alert("Isi deskripsi gambar dulu!");
+// Mengambil Elemen DOM
+const promptInput = document.getElementById('promptInput');
+const styleInput = document.getElementById('styleInput');
+const ratioInput = document.getElementById('ratioInput');
+const enhanceInput = document.getElementById('enhanceInput');
+const generateBtn = document.getElementById('generateBtn');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-    // UI ELEMENTS
-    const imgEl = document.getElementById('outputImage');
-    const loader = document.getElementById('loading');
-    const placeholder = document.getElementById('placeholder');
-    const errorMsg = document.getElementById('errorMsg');
-    const actions = document.getElementById('actions');
-    const dlBtn = document.getElementById('downloadBtn');
-    const manualLink = document.getElementById('manualLink');
+const resultImage = document.getElementById('resultImage');
+const loader = document.getElementById('loader');
+const placeholder = document.getElementById('placeholder');
+const actionButtons = document.getElementById('actionButtons');
+const historyContainer = document.getElementById('historyContainer');
 
-    // RESET TAMPILAN
-    loader.style.display = "flex";
-    placeholder.style.display = "none";
-    imgEl.style.display = "none";
-    errorMsg.style.display = "none";
-    actions.style.display = "none";
+// Event Listeners
+document.addEventListener('DOMContentLoaded', loadHistory);
+generateBtn.addEventListener('click', generateImage);
+clearHistoryBtn.addEventListener('click', clearHistory);
+downloadBtn.addEventListener('click', downloadImage);
+fullscreenBtn.addEventListener('click', () => {
+    if (resultImage.src) window.open(resultImage.src, '_blank');
+});
 
-    // PARAMETER
-    const model = document.getElementById('model').value;
-    const ratio = document.getElementById('ratio').value;
-    const style = document.getElementById('style').value;
+// Fungsi Utama Generate
+async function generateImage() {
+    const promptRaw = promptInput.value.trim();
+    
+    if (!promptRaw) {
+        alert("Harap masukkan deskripsi gambar (Prompt) terlebih dahulu!");
+        return;
+    }
 
-    let w = 1024, h = 1024;
-    if (ratio === "16:9") { w = 1280; h = 720; }
-    else if (ratio === "9:16") { w = 720; h = 1280; }
-    else if (ratio === "4:5") { w = 864; h = 1080; }
+    // Ubah status UI jadi Loading
+    setLoading(true);
 
-    // PROMPT ENGINEERING
-    let finalPrompt = promptText;
-    if (style) finalPrompt += `, ${style} style`;
-    finalPrompt += ", 8k resolution, highly detailed, masterpiece, sharp focus, HDR, cinematic lighting";
+    // Siapkan Parameter
+    const style = styleInput.value;
+    // Menggabungkan style ke dalam prompt agar hasil lebih akurat
+    const finalPrompt = style ? `${promptRaw}, ${style}, highly detailed, 8k resolution` : promptRaw;
+    const [width, height] = ratioInput.value.split('x');
+    const isEnhance = enhanceInput.checked;
+    
+    // Seed Random agar gambar selalu baru meskipun prompt sama
+    const seed = Math.floor(Math.random() * 1000000); 
 
-    // KONSTRUKSI URL (ANTI-CACHE)
-    const seed = Math.floor(Math.random() * 1000000);
-    // encodeURIComponent WAJIB agar spasi tidak memutus link
+    // Encode Prompt URL
     const encodedPrompt = encodeURIComponent(finalPrompt);
     
-    // Parameter timestamp (&t=) memaksa browser memuat gambar baru
-    const timeStamp = Date.now(); 
-    
-    const imageUrl = `${BASE_URL}${encodedPrompt}?width=${w}&height=${h}&model=${model}&seed=${seed}&nologo=true&enhance=true&t=${timeStamp}`;
+    // Susun URL Final
+    const url = `${BASE_URL}${encodedPrompt}?width=${width}&height=${height}&model=flux&quality=hd&enhance=${isEnhance}&nologo=true&private=false&seed=${seed}`;
 
-    console.log("Requesting:", imageUrl); // Cek console untuk debug
+    currentImageUrl = url;
 
-    // SET URL GAMBAR
-    imgEl.src = imageUrl;
-    
-    // UPDATE LINK MANUAL & DOWNLOAD
-    // Ini penting jika gambar tidak muncul di preview, user bisa klik manual
-    manualLink.href = imageUrl;
-    dlBtn.href = imageUrl;
-
-    // EVENT LISTENER
-    imgEl.onload = function() {
-        loader.style.display = "none";
-        imgEl.style.display = "block";
-        actions.style.display = "flex";
+    // Load Gambar
+    resultImage.onload = () => {
+        setLoading(false);
+        saveToHistory(url);
     };
 
-    imgEl.onerror = function() {
-        loader.style.display = "none";
-        errorMsg.style.display = "block";
-        // Jangan alert, cukup tampilkan pesan error dan link manual
+    resultImage.onerror = () => {
+        setLoading(false);
+        alert("Gagal membuat gambar. Coba persingkat prompt atau coba lagi nanti.");
     };
+
+    resultImage.src = url;
 }
 
-function copyLink() {
-    const url = document.getElementById('downloadBtn').href;
-    if(url && url !== "#") {
-        navigator.clipboard.writeText(url);
-        alert("Link gambar disalin!");
+// Fungsi Mengatur Tampilan Loading
+function setLoading(isLoading) {
+    if (isLoading) {
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Membuat...';
+        loader.style.display = 'block';
+        placeholder.style.display = 'none';
+        resultImage.style.display = 'none';
+        actionButtons.classList.remove('active');
+    } else {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<i class="fas fa-bolt"></i> Generate Image';
+        loader.style.display = 'none';
+        resultImage.style.display = 'block';
+        actionButtons.classList.add('active');
+    }
+}
+
+// Fungsi Download (Mengatasi masalah CORS/Tab baru)
+async function downloadImage() {
+    if (!currentImageUrl) return;
+
+    try {
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        const response = await fetch(currentImageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        // Nama file unik berdasarkan waktu
+        a.download = `dery-ai-gen-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download HD';
+    } catch (error) {
+        console.error(error);
+        alert("Gagal download otomatis. Silakan 'Klik Kanan > Save Image' pada gambar.");
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download HD';
+    }
+}
+
+// --- FUNGSI HISTORY ---
+
+function saveToHistory(url) {
+    let history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
+    
+    // Tambah ke awal array
+    history.unshift(url);
+    
+    // Batasi maks 12 gambar
+    if (history.length > 12) history.pop();
+    
+    localStorage.setItem('deryAiHistory', JSON.stringify(history));
+    renderHistory();
+}
+
+function loadHistory() {
+    renderHistory();
+}
+
+function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('deryAiHistory')) || [];
+    historyContainer.innerHTML = '';
+
+    history.forEach(url => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<img src="${url}" loading="lazy" alt="History Item">`;
+        
+        // Klik history untuk load kembali ke preview utama
+        div.onclick = () => {
+            setLoading(true);
+            currentImageUrl = url;
+            resultImage.src = url;
+            // Kita tidak perlu trigger saveToHistory lagi saat restore
+            resultImage.onload = () => setLoading(false);
+        };
+        
+        historyContainer.appendChild(div);
+    });
+}
+
+function clearHistory() {
+    if(confirm("Yakin ingin menghapus semua riwayat?")) {
+        localStorage.removeItem('deryAiHistory');
+        renderHistory();
     }
 }
