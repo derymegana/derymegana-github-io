@@ -183,7 +183,7 @@
         <aside class="sidebar">
             <div class="control-group">
                 <label for="promptInput" data-i18n="promptLabel">Prompt (Teks atau format JSON)</label>
-                <textarea id="promptInput" placeholder='Contoh:&#10;Kucing robot di mars...&#10;&#10;Atau JSON:&#10;{ "prompt": "Mobil terbang", "width": 1024, "model": "flux" }' data-i18n-ph="promptPh"></textarea>
+                <textarea id="promptInput" placeholder='Contoh:&#10;Kucing robot di mars...&#10;&#10;Atau JSON:&#10;{ "prompt": "Kucing robot", "width": 1024, "model": "flux" }' data-i18n-ph="promptPh"></textarea>
                 <div class="btn-group">
                     <button class="btn-small" onclick="enhancePrompt()" data-i18n="enhanceBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Enhance</button>
                     <button class="btn-small" onclick="randomPrompt()" data-i18n="randomBtn"><i class="fa-solid fa-dice"></i> Acak</button>
@@ -277,7 +277,7 @@
                     <div class="spinner"></div>
                     <p style="margin-top:15px; font-size:0.9rem; color:var(--text-dim);" id="loadingText">Sedang melukis karya Anda...</p>
                 </div>
-                <img src="" alt="Generated Image" class="result-img" id="resultImage">
+                <img src="" alt="Generated Image" class="result-img" id="resultImage" crossorigin="anonymous">
                 <div id="placeholderText" style="color:var(--text-dim);">
                     <i class="fa-regular fa-image" style="font-size:3rem; display:block; text-align:center; margin-bottom:10px;"></i>
                     <span data-i18n="placeholder">Gambar akan muncul di sini</span>
@@ -303,7 +303,7 @@
 
     <footer>
         <p>&copy; 2026 DERY AI GENERATOR. Powered by Pollinations API.</p>
-        <p>Developed by Dery Lau. Thanks to Github, Cloudflare & Gemini AI.</p>
+        <p>Developed by Dery Lau. Thanks to Gemini AI.</p>
     </footer>
 
     <script>
@@ -412,7 +412,7 @@
 
         async function generateImage() {
             const promptRaw = document.getElementById('promptInput').value.trim();
-            if (!promptRaw) { alert("Mohon isi prompt!"); return; }
+            if (!promptRaw) { alert(currentLang === 'id' ? "Mohon isi prompt!" : "Please fill in the prompt!"); return; }
 
             let pText = promptRaw;
             let pWidth = document.getElementById('widthInput').value;
@@ -439,12 +439,12 @@
             const loadingText = document.getElementById('loadingText');
 
             btn.disabled = true;
-            btn.innerText = "DERY PROCESSING...";
+            btn.innerText = currentLang === 'id' ? "DERY PROCESSING..." : "DERY IS PROCESSING...";
             loader.style.display = "flex";
             resultImg.style.display = "none";
             placeholder.style.display = "none";
             actionBar.style.display = "none";
-            loadingText.innerText = "Sedang melukis karya Anda...";
+            loadingText.innerText = currentLang === 'id' ? "Sedang melukis karya Anda..." : "Painting your masterpiece...";
 
             // Memasukkan fitur tambahan (Enhance/Safe) LANGSUNG ke teks, bukan ke parameter URL (Mencegah Error 400 API)
             let finalPrompt = pText;
@@ -473,9 +473,10 @@
 
             // Timer jika API memakan waktu lama (agar user tahu tidak hang)
             let loadTimer = setTimeout(() => {
-                loadingText.innerText = "Membutuhkan waktu lebih lama, mohon bersabar...";
+                loadingText.innerText = currentLang === 'id' ? "Membutuhkan waktu lebih lama, mohon bersabar..." : "Taking longer, please be patient...";
             }, 8000);
 
+            // Coba memuat gambar. crossorigin="anonymous" harus disetel pada <img> di HTML.
             resultImg.src = url;
 
             resultImg.onload = () => {
@@ -484,17 +485,18 @@
                 resultImg.style.display = "block";
                 actionBar.style.display = "flex";
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> GENERATE GAMBAR';
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> ' + (currentLang === 'id' ? 'GENERATE GAMBAR' : 'GENERATE IMAGE');
                 addToHistory(url, promptRaw);
             };
 
-            resultImg.onerror = () => {
+            resultImg.onerror = (e) => {
                 clearTimeout(loadTimer);
                 loader.style.display = "none";
                 placeholder.style.display = "block";
-                placeholder.innerText = "Gagal memuat. Pastikan koneksi internet stabil atau coba ganti prompt.";
+                placeholder.innerText = currentLang === 'id' ? "Gagal memuat. Pastikan koneksi internet stabil atau coba ganti prompt. (Masalah CORS/Rate Limit API)" : "Failed to load. Check your internet connection or try a different prompt. (CORS issue/Rate Limit)";
                 btn.disabled = false;
-                btn.innerText = "COBA LAGI";
+                btn.innerText = currentLang === 'id' ? "COBA LAGI" : "TRY AGAIN";
+                console.error("Kesalahan pemuatan gambar (mungkin CORS atau API timeout):", e);
             };
         }
 
@@ -529,29 +531,31 @@
             renderHistory();
         }
 
+        // Fungsi unduhan yang ditingkatkan untuk hosting web, menggunakan fetch untuk mendapatkan blob.
         async function downloadImage() {
             const img = document.getElementById('resultImage');
             const url = img.src;
             if (!url) return;
 
-            // Catatan: Jika dibuka di File Manager (content://), proses fetch/canvas mungkin tetap terblokir.
-            // Fitur ini akan otomatis bekerja sempurna 100% saat file ini sudah di-hosting (meski di localhost).
             try {
+                // Trik aman fetch blob untuk dikonversi ke PNG murni, ini membutuhkan header CORS yang benar di server.
                 const response = await fetch(url);
                 const blob = await response.blob();
                 const imageBitmap = await createImageBitmap(blob);
                 
+                // Buat canvas untuk menggambar ulang gambar asli
                 const canvas = document.createElement('canvas');
                 canvas.width = imageBitmap.width;
                 canvas.height = imageBitmap.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(imageBitmap, 0, 0);
 
+                // Ekstrak sebagai image/png murni
                 canvas.toBlob((pngBlob) => {
                     const objectUrl = window.URL.createObjectURL(pngBlob);
                     const a = document.createElement('a');
                     a.href = objectUrl;
-                    a.download = `DERY-AI-${Date.now()}.png`; 
+                    a.download = `DERY-AI-${Date.now()}.png`; // Ekstensi khusus .png
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -559,7 +563,8 @@
                 }, 'image/png');
 
             } catch (e) {
-                // Fallback normal download
+                // Fallback paling aman jika fetch masih kena blokir di local file: Unduhan standar via href
+                console.error("Konversi canvas diblokir (mungkin masalah CORS), fallback unduhan JPG dipicu.", e);
                 const a = document.createElement('a');
                 a.href = url;
                 a.target = '_blank';
@@ -574,7 +579,10 @@
             const url = document.getElementById('resultImage').src;
             const link = encodeURIComponent(url); 
             let shareUrl = "";
-            if (platform === 'wa') shareUrl = `https://wa.me/?text=Check%20out%20this%20image%20from%20DERY%20AI!%20${link}`;
+            const text = encodeURIComponent("Check out this image from DERY AI!");
+            if (platform === 'wa') shareUrl = `https://wa.me/?text=${text}%20${link}`;
+            if (platform === 'fb') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${link}`;
+            if (platform === 'tw') shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${link}`;
             window.open(shareUrl, '_blank');
         }
 
