@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>DERY AI - Ultimate Image Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -16,6 +16,7 @@
             --text-dim: #b0b0b0;
             --accent-blue: #00d2ff;
             --danger: #ff4757;
+            --success: #2ecc71;
             --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -98,6 +99,22 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
+        .api-banner {
+            background-color: rgba(255, 165, 0, 0.1);
+            border: 1px solid orange;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        [data-theme="light"] .api-banner { color: #d97700; border-color: #d97700; }
+
+        .api-banner a { color: var(--primary-gold); font-weight: bold; text-decoration: none; }
+        [data-theme="light"] .api-banner a { color: #d97700; }
+
         .control-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-dim); font-weight: 600; }
 
@@ -109,11 +126,14 @@
         [data-theme="light"] textarea { background: #f9f9f9; color: #333; }
         textarea:focus { outline: none; box-shadow: 0 0 15px var(--primary-gold); }
 
-        select, input[type="text"], input[type="number"] {
+        select, input[type="text"], input[type="number"], input[type="password"] {
             width: 100%; padding: 10px; background: rgba(255,255,255,0.05);
-            border: 1px solid #444; color: var(--text-light); border-radius: 6px;
+            border: 1px solid #444; color: var(--text-light); border-radius: 6px; outline: none;
         }
-        [data-theme="light"] select { background: #fff; border: 1px solid #ccc; color: #333; }
+        select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus {
+            border-color: var(--primary-gold);
+        }
+        [data-theme="light"] select, [data-theme="light"] input[type="text"], [data-theme="light"] input[type="number"], [data-theme="light"] input[type="password"] { background: #fff; border: 1px solid #ccc; color: #333; }
         input[type="range"] { width: 100%; accent-color: var(--primary-gold); }
 
         .btn-group { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -142,9 +162,12 @@
             background: var(--panel-dark); border-radius: 12px; min-height: 400px;
             display: flex; justify-content: center; align-items: center; border: 2px dashed #444;
             position: relative; overflow: hidden; padding: 10px; flex-direction: column;
+            transition: border-color 0.5s, box-shadow 0.5s;
         }
+        .image-container.success { border-color: var(--primary-gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); border-style: solid; }
+        .image-container.error { border-color: var(--danger); }
 
-        .result-img { max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); display: none; }
+        .result-img { max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); display: none; object-fit: contain; }
 
         .loading-overlay { display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--primary-gold); text-align: center; }
         .dery-loader { font-size: 2rem; font-weight: bold; text-transform: uppercase; animation: pulse 1.5s infinite; text-shadow: var(--neon-glow); margin-bottom: 15px; }
@@ -167,6 +190,7 @@
         .panel { padding: 0 10px; display: none; background-color: rgba(0,0,0,0.2); overflow: hidden; border-radius: 0 0 5px 5px; margin-bottom: 10px; }
         footer { background: #000; padding: 20px; text-align: center; font-size: 0.8rem; color: #666; border-top: 1px solid #333; margin-top: auto; }
         .ratio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; }
+
     </style>
 </head>
 <body data-theme="dark">
@@ -181,9 +205,19 @@
 
     <main>
         <aside class="sidebar">
+            
+            <div class="api-banner" id="apiBanner">
+                ⚠️ <span data-i18n="apiInfo">Sistem kini mewajibkan API Key. Dapatkan secara gratis di</span> <a href="https://enter.pollinations.ai" target="_blank">enter.pollinations.ai</a>.
+            </div>
+
             <div class="control-group">
-                <label for="promptInput" data-i18n="promptLabel">Prompt (Teks atau format JSON)</label>
-                <textarea id="promptInput" placeholder='Contoh:&#10;Kucing robot di mars...&#10;&#10;Atau JSON:&#10;{ "prompt": "Kucing robot", "width": 1024, "model": "flux" }' data-i18n-ph="promptPh"></textarea>
+                <label for="apiKeyInput" data-i18n="apiKeyLabel">🔑 API Key (Otomatis Tersimpan)</label>
+                <input type="password" id="apiKeyInput" placeholder="Masukkan API Key (pk_...)" required>
+            </div>
+
+            <div class="control-group">
+                <label for="promptInput" data-i18n="promptLabel">Prompt (Deskripsi Gambar)</label>
+                <textarea id="promptInput" placeholder="Contoh: Kucing robot di mars..." data-i18n-ph="promptPh"></textarea>
                 <div class="btn-group">
                     <button class="btn-small" onclick="enhancePrompt()" data-i18n="enhanceBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Enhance</button>
                     <button class="btn-small" onclick="randomPrompt()" data-i18n="randomBtn"><i class="fa-solid fa-dice"></i> Acak</button>
@@ -199,24 +233,23 @@
             <div class="control-group">
                 <label data-i18n="modelLabel">Model AI</label>
                 <select id="modelSelect">
-                    <option value="flux">Flux (Default)</option>
-                    <option value="turbo">Turbo</option>
-                    <option value="dall-e-3">DALL-E 3 Style</option>
-                    <option value="midjourney">Midjourney Style</option>
-                    <option value="stable-diffusion">Stable Diffusion</option>
+                    <option value="flux">Flux (Default & Cepat)</option>
+                    <option value="flux-realism">Flux Realism (Fotorealistis)</option>
+                    <option value="flux-pro">Flux Pro (Detail Tinggi)</option>
+                    <option value="turbo">Turbo (Super Cepat)</option>
+                    <option value="any-dark">Any Dark (Sinematik/Gelap)</option>
                 </select>
             </div>
 
             <div class="control-group">
-                <label data-i18n="styleLabel">Gaya Artistik</label>
+                <label data-i18n="styleLabel">Gaya Artistik / Style</label>
                 <select id="styleSelect">
-                    <option value="">Default / None</option>
-                    <option value="realistic">Realistic</option>
-                    <option value="digital art">Digital Art</option>
-                    <option value="anime">Anime Style</option>
-                    <option value="photography">Photography</option>
-                    <option value="3d render">3D Render</option>
-                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="">Tidak ada (Sesuai Prompt)</option>
+                    <option value="Cinematic lighting, 8k resolution, highly detailed, professional photo style">Cinematic lighting, 8k</option>
+                    <option value="Quantum Fold Distortion, surreal collapsing realities, fractal patterns, intricate details">Quantum Fold</option>
+                    <option value="Lowbrow Pop Surrealism, absurd and humorous character design, highly detailed">Pop Surrealism</option>
+                    <option value="Tribal Explosion Graffiti, vibrant colors, kinetic energy, complex street art style">Tribal Graffiti</option>
+                    <option value="Ukiyo-e Japanese Woodblock Print, traditional ink style, flowing lines">Ukiyo-e Woodblock</option>
                 </select>
             </div>
 
@@ -229,7 +262,7 @@
                 <label class="switch"><input type="checkbox" id="enhanceCheck" checked><span class="slider"></span></label>
             </div>
             <div class="toggle-container">
-                <span data-i18n="ultraDetail">Super Ultra Detail (PNG Output)</span>
+                <span data-i18n="ultraDetail">Super Ultra Detail</span>
                 <label class="switch"><input type="checkbox" id="ultraDetailCheck" checked><span class="slider"></span></label>
             </div>
 
@@ -302,28 +335,32 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 DERY AI GENERATOR. Powered by Pollinations API.</p>
-        <p>Developed by Dery Lau. Thanks to Gemini AI.</p>
+        <p>&copy; 2026 DERY AI GENERATOR. Powered by Secure Pollinations API.</p>
+        <p>Developed by Dery Lau.</p>
     </footer>
 
     <script>
-        const API_BASE = "https://image.pollinations.ai/prompt/";
+        const API_BASE = "https://gen.pollinations.ai/image/"; // Menggunakan Endpoint baru
         let currentLang = 'id';
         let isDarkMode = true;
+        let abortController = null; 
+        let currentObjectURL = null; // Menyimpan blob URL
 
         const langData = {
             id: {
-                promptLabel: "Prompt (Teks atau format JSON)",
-                promptPh: 'Contoh:\nKota futuristik...\n\nAtau format JSON:\n{ "prompt": "Mobil terbang", "width": 1024 }',
+                apiInfo: "Sistem kini mewajibkan API Key. Dapatkan secara gratis di",
+                apiKeyLabel: "🔑 API Key (Otomatis Tersimpan)",
+                promptLabel: "Prompt (Deskripsi Gambar)",
+                promptPh: 'Contoh: Kota futuristik...',
                 enhanceBtn: "Enhance",
                 randomBtn: "Acak",
                 negPrompt: "Negative Prompt (Hindari)",
                 negPh: "buruk, kabur, kualitas rendah",
                 modelLabel: "Model AI",
-                styleLabel: "Gaya Artistik",
+                styleLabel: "Gaya Artistik / Style",
                 nsfwLabel: "Filter Konten Aman (Safe)",
                 enhanceParam: "Parameter Auto Enhance",
-                ultraDetail: "Super Ultra Detail (PNG Output)",
+                ultraDetail: "Super Ultra Detail",
                 ratioLabel: "Aspek Rasio & Resolusi",
                 advSettings: "Pengaturan Lanjutan",
                 genBtn: "GENERATE GAMBAR",
@@ -332,8 +369,10 @@
                 history: "Riwayat Prompt"
             },
             en: {
-                promptLabel: "Prompt (Text or JSON format)",
-                promptPh: 'Example:\nA futuristic city...\n\nOr JSON format:\n{ "prompt": "Flying car", "width": 1024 }',
+                apiInfo: "The system now requires an API Key. Get it for free at",
+                apiKeyLabel: "🔑 API Key (Auto-Saved)",
+                promptLabel: "Prompt (Image Description)",
+                promptPh: 'Example: A futuristic city...',
                 enhanceBtn: "Enhance",
                 randomBtn: "Random",
                 negPrompt: "Negative Prompt (Avoid)",
@@ -342,7 +381,7 @@
                 styleLabel: "Artistic Style",
                 nsfwLabel: "Safe Content Filter",
                 enhanceParam: "Auto Enhance Parameter",
-                ultraDetail: "Super Ultra Detail (PNG Output)",
+                ultraDetail: "Super Ultra Detail",
                 ratioLabel: "Aspect Ratio & Resolution",
                 advSettings: "Advanced Settings",
                 genBtn: "GENERATE IMAGE",
@@ -351,6 +390,14 @@
                 history: "Prompt History"
             }
         };
+
+        // FITUR AUTO-SAVE API KEY
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('dery_api_key');
+            if (savedKey) {
+                document.getElementById('apiKeyInput').value = savedKey;
+            }
+        });
 
         function updateLanguage() {
             const t = langData[currentLang];
@@ -410,26 +457,60 @@
             else randomPrompt();
         }
 
-        async function generateImage() {
+        function buildFinalPrompt() {
             const promptRaw = document.getElementById('promptInput').value.trim();
-            if (!promptRaw) { alert(currentLang === 'id' ? "Mohon isi prompt!" : "Please fill in the prompt!"); return; }
-
-            let pText = promptRaw;
-            let pWidth = document.getElementById('widthInput').value;
-            let pHeight = document.getElementById('heightInput').value;
-            let pSeed = document.getElementById('seedInput').value || Math.floor(Math.random() * 1000000);
-            let pModel = document.getElementById('modelSelect').value;
-            let pNeg = document.getElementById('negativePrompt').value;
+            const style = document.getElementById('styleSelect').value;
+            const ultra = document.getElementById('ultraDetailCheck').checked;
+            const isSafe = document.getElementById('nsfwCheck').checked;
+            const isEnhance = document.getElementById('enhanceCheck').checked;
             
-            try {
-                const jsonPrompt = JSON.parse(promptRaw);
-                if (jsonPrompt && typeof jsonPrompt === 'object') {
-                    pText = jsonPrompt.prompt || pText;
-                    if (jsonPrompt.width) { pWidth = jsonPrompt.width; document.getElementById('widthInput').value = pWidth; }
-                    if (jsonPrompt.height) { pHeight = jsonPrompt.height; document.getElementById('heightInput').value = pHeight; }
-                    if (jsonPrompt.model) { pModel = jsonPrompt.model; document.getElementById('modelSelect').value = pModel; }
-                }
-            } catch (e) {}
+            let finalPrompt = promptRaw;
+            
+            if (style) finalPrompt += `, ${style}`;
+            if (isEnhance) finalPrompt += `, masterpiece, highly detailed, vivid colors, sharp focus`;
+            if (ultra) finalPrompt += `, hyper detailed, ultra high resolution, photorealistic masterpiece`;
+            if (isSafe) finalPrompt += `, safe for work, pg-13`;
+            
+            return finalPrompt;
+        }
+
+        async function generateImage() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const promptRaw = document.getElementById('promptInput').value.trim();
+            
+            if (!apiKey) {
+                alert(currentLang === 'id' ? "Tolong masukkan API Key Anda!" : "Please enter your API Key!");
+                return;
+            }
+
+            if (!promptRaw) { 
+                alert(currentLang === 'id' ? "Mohon isi prompt!" : "Please fill in the prompt!"); 
+                return; 
+            }
+
+            // Simpan API Key
+            localStorage.setItem('dery_api_key', apiKey);
+
+            if (abortController) {
+                abortController.abort();
+            }
+            abortController = new AbortController();
+
+            let pWidth = parseInt(document.getElementById('widthInput').value);
+            let pHeight = parseInt(document.getElementById('heightInput').value);
+            let pSeed = document.getElementById('seedInput').value || Math.floor(Math.random() * 999999999);
+            let pModel = document.getElementById('modelSelect').value;
+            let pNeg = document.getElementById('negativePrompt').value.trim();
+            
+            let finalPrompt = buildFinalPrompt();
+            const encodedPrompt = encodeURIComponent(finalPrompt);
+            
+            // Susun URL dengan endpoint baru
+            let fullUrl = `${API_BASE}${encodedPrompt}?model=${pModel}&width=${pWidth}&height=${pHeight}&seed=${pSeed}&nologo=true&key=${apiKey}`;
+
+            if (pNeg) {
+                fullUrl += `&negative=${encodeURIComponent(pNeg)}`;
+            }
 
             const btn = document.getElementById('genBtn');
             const loader = document.getElementById('loader');
@@ -437,67 +518,71 @@
             const placeholder = document.getElementById('placeholderText');
             const actionBar = document.getElementById('actionBar');
             const loadingText = document.getElementById('loadingText');
+            const imgContainer = document.getElementById('imgContainer');
 
             btn.disabled = true;
-            btn.innerText = currentLang === 'id' ? "DERY PROCESSING..." : "DERY IS PROCESSING...";
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + (currentLang === 'id' ? "MEMPROSES..." : "PROCESSING...");
             loader.style.display = "flex";
             resultImg.style.display = "none";
             placeholder.style.display = "none";
             actionBar.style.display = "none";
-            loadingText.innerText = currentLang === 'id' ? "Sedang melukis karya Anda..." : "Painting your masterpiece...";
+            imgContainer.classList.remove('success', 'error');
+            loadingText.innerText = currentLang === 'id' ? "Menghubungi AI server..." : "Connecting to AI server...";
 
-            // Memasukkan fitur tambahan (Enhance/Safe) LANGSUNG ke teks, bukan ke parameter URL (Mencegah Error 400 API)
-            let finalPrompt = pText;
-            const style = document.getElementById('styleSelect').value;
-            const ultra = document.getElementById('ultraDetailCheck').checked;
-            const isSafe = document.getElementById('nsfwCheck').checked;
-            const isEnhance = document.getElementById('enhanceCheck').checked;
-            
-            if (style) finalPrompt += `, ${style} style`;
-            if (isEnhance) finalPrompt += `, masterpiece, highly detailed, vivid colors, sharp focus`;
-            if (ultra) finalPrompt += `, hyper detailed, ultra high resolution, 8k, photorealistic masterpiece`;
-            if (isSafe) finalPrompt += `, safe for work, pg-13`;
-            if (pModel === 'dall-e-3') finalPrompt += `, highly realistic, dall-e 3 style`;
-            if (pModel === 'midjourney') finalPrompt += `, midjourney v6 style`;
-            if (pNeg) finalPrompt += `, excluding ${pNeg}`;
-
-            // Konstruksi URL API yang sangat bersih
-            let url = `${API_BASE}${encodeURIComponent(finalPrompt)}?`;
-            url += `width=${pWidth}&height=${pHeight}&seed=${pSeed}&nologo=true`;
-            if (pModel && pModel !== 'dall-e-3' && pModel !== 'midjourney') {
-                url += `&model=${pModel}`;
+            if (currentObjectURL) {
+                URL.revokeObjectURL(currentObjectURL);
+                currentObjectURL = null;
             }
-            
-            // Tambahan unik agar browser tidak memblokir (cache buster)
-            url += `&t=${Date.now()}`;
 
-            // Timer jika API memakan waktu lama (agar user tahu tidak hang)
-            let loadTimer = setTimeout(() => {
-                loadingText.innerText = currentLang === 'id' ? "Membutuhkan waktu lebih lama, mohon bersabar..." : "Taking longer, please be patient...";
-            }, 8000);
+            try {
+                const response = await fetch(fullUrl, { signal: abortController.signal });
 
-            // Coba memuat gambar. crossorigin="anonymous" harus disetel pada <img> di HTML.
-            resultImg.src = url;
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error(currentLang === 'id' ? "Akses Ditolak (401/403). API Key Anda salah atau kuota model habis." : "Access Denied. API Key is invalid or quota exceeded.");
+                }
 
-            resultImg.onload = () => {
-                clearTimeout(loadTimer);
-                loader.style.display = "none";
-                resultImg.style.display = "block";
-                actionBar.style.display = "flex";
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> ' + (currentLang === 'id' ? 'GENERATE GAMBAR' : 'GENERATE IMAGE');
-                addToHistory(url, promptRaw);
-            };
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
-            resultImg.onerror = (e) => {
-                clearTimeout(loadTimer);
+                const blob = await response.blob();
+                
+                if (blob.type.includes('application/json') || blob.type.includes('text/html')) {
+                    throw new Error(currentLang === 'id' ? "Server gagal mengirim gambar. Periksa koneksi/API Key." : "Server failed to send image.");
+                }
+
+                currentObjectURL = URL.createObjectURL(blob);
+
+                resultImg.onload = () => {
+                    loader.style.display = "none";
+                    resultImg.style.display = "block";
+                    actionBar.style.display = "flex";
+                    imgContainer.classList.add('success');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-bolt"></i> ' + (currentLang === 'id' ? 'GENERATE GAMBAR' : 'GENERATE IMAGE');
+                };
+
+                resultImg.src = currentObjectURL;
+
+                // Simpan parameter URL (tanpa API Key agar aman) ke riwayat
+                const historyUrl = `${API_BASE}${encodedPrompt}?model=${pModel}&width=${pWidth}&height=${pHeight}&seed=${pSeed}&nologo=true`;
+                addToHistory(historyUrl, promptRaw);
+
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+
+                console.error('Generation error:', error);
                 loader.style.display = "none";
                 placeholder.style.display = "block";
-                placeholder.innerText = currentLang === 'id' ? "Gagal memuat. Pastikan koneksi internet stabil atau coba ganti prompt. (Masalah CORS/Rate Limit API)" : "Failed to load. Check your internet connection or try a different prompt. (CORS issue/Rate Limit)";
+                imgContainer.classList.add('error');
+                placeholder.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size:2rem; color:var(--danger); display:block; margin-bottom:10px;"></i>
+                    <span style="color:var(--danger);">${error.message}</span>
+                `;
+                
                 btn.disabled = false;
-                btn.innerText = currentLang === 'id' ? "COBA LAGI" : "TRY AGAIN";
-                console.error("Kesalahan pemuatan gambar (mungkin CORS atau API timeout):", e);
-            };
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> ' + (currentLang === 'id' ? 'COBA LAGI' : 'TRY AGAIN');
+            }
         }
 
         function addToHistory(url, prompt) {
@@ -515,9 +600,20 @@
             history.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
-                div.innerHTML = `<img src="${item.url}" alt="${item.prompt}">`;
+                const img = document.createElement('img');
+                // Mengambil URL history (tapi butuh API key untuk me-load ulang jika itu fresh request)
+                // Kita gunakan tag img sederhana
+                img.src = item.url + `&key=${document.getElementById('apiKeyInput').value.trim()}`;
+                img.alt = item.prompt;
+                img.loading = 'lazy';
+                div.appendChild(img);
                 div.onclick = () => {
-                    document.getElementById('resultImage').src = item.url;
+                    const apiKey = document.getElementById('apiKeyInput').value.trim();
+                    if (!apiKey) {
+                        alert("Masukkan API Key terlebih dahulu untuk melihat riwayat");
+                        return;
+                    }
+                    document.getElementById('resultImage').src = item.url + `&key=${apiKey}`;
                     document.getElementById('resultImage').style.display = 'block';
                     document.getElementById('placeholderText').style.display = 'none';
                     document.getElementById('actionBar').style.display = 'flex';
@@ -531,59 +627,44 @@
             renderHistory();
         }
 
-        // Fungsi unduhan yang ditingkatkan untuk hosting web, menggunakan fetch untuk mendapatkan blob.
-        async function downloadImage() {
-            const img = document.getElementById('resultImage');
-            const url = img.src;
-            if (!url) return;
+        // Fungsi Download yang lebih kokoh menggunakan Canvas
+        function downloadImage() {
+            const imgEl = document.getElementById('resultImage');
+            if (!imgEl.src || imgEl.style.display === 'none') return;
 
-            try {
-                // Trik aman fetch blob untuk dikonversi ke PNG murni, ini membutuhkan header CORS yang benar di server.
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const imageBitmap = await createImageBitmap(blob);
-                
-                // Buat canvas untuk menggambar ulang gambar asli
-                const canvas = document.createElement('canvas');
-                canvas.width = imageBitmap.width;
-                canvas.height = imageBitmap.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(imageBitmap, 0, 0);
-
-                // Ekstrak sebagai image/png murni
-                canvas.toBlob((pngBlob) => {
-                    const objectUrl = window.URL.createObjectURL(pngBlob);
-                    const a = document.createElement('a');
-                    a.href = objectUrl;
-                    a.download = `DERY-AI-${Date.now()}.png`; // Ekstensi khusus .png
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(objectUrl);
-                }, 'image/png');
-
-            } catch (e) {
-                // Fallback paling aman jika fetch masih kena blokir di local file: Unduhan standar via href
-                console.error("Konversi canvas diblokir (mungkin masalah CORS), fallback unduhan JPG dipicu.", e);
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.download = `DERY-AI-${Date.now()}.jpg`; 
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
+            const canvas = document.createElement('canvas');
+            canvas.width = imgEl.naturalWidth;
+            canvas.height = imgEl.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.drawImage(imgEl, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `DERY-AI-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function shareSocial(platform) {
-            const url = document.getElementById('resultImage').src;
-            const link = encodeURIComponent(url); 
+            const resultImg = document.getElementById('resultImage');
+            const imgSrc = resultImg.src;
+            if (!imgSrc || imgSrc === '' || resultImg.style.display === 'none') return;
+
+            const text = encodeURIComponent("Coba lihat gambar yang saya buat dengan DERY AI!");
             let shareUrl = "";
-            const text = encodeURIComponent("Check out this image from DERY AI!");
-            if (platform === 'wa') shareUrl = `https://wa.me/?text=${text}%20${link}`;
-            if (platform === 'fb') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${link}`;
-            if (platform === 'tw') shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${link}`;
-            window.open(shareUrl, '_blank');
+            
+            if (platform === 'wa') {
+                shareUrl = `https://wa.me/?text=${text}`;
+            } else if (platform === 'fb') {
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            } else if (platform === 'tw') {
+                shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
+            }
+            
+            window.open(shareUrl, '_blank', 'noopener,noreferrer');
         }
 
         window.onload = () => {
